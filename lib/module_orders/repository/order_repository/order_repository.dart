@@ -34,7 +34,7 @@ class OrderRepository {
        batch.set(moreOrderRef, orderRequest.moreDetailsToJson());
 
       /// Commit the batch
-       batch.commit().then((_) {
+      await batch.commit().then((_) {
          print('Data Success Commit !!!!!!');
        }).catchError((e){
          throw Exception();
@@ -144,13 +144,29 @@ class OrderRepository {
   }
   
  Future<bool> deleteOrder(String orderId)async {
-    print('delete order by order id: ${orderId}');
-    try{
-      await _firestore.collection('orders').doc(orderId).delete();
-     //  await Future.wait([
-     //    //_firestore.collection('orders').doc(orderId).collection('details').
 
- //  ]);
+    print('delete order by order id: ${orderId}');
+
+    try{
+
+      /// Get a new write batch
+      final batch = _firestore.batch();
+
+      /// remove Main Detail
+      var mainOrderRef = _firestore.collection('orders').doc(orderId);
+      batch.delete(mainOrderRef);
+
+      /// remove More Detail
+      var moreOrderRef = _firestore.collection('orders').doc(mainOrderRef.id).collection('details').doc();
+      batch.delete(moreOrderRef);
+
+      /// Commit the batch
+     await batch.commit().then((_) {
+        print('Data Success Commit !!!!!!');
+      }).catchError((e){
+        throw Exception();
+      });
+
       return true;
     }catch(e){
       print('tag : repository , message : Error in deleted !!! ');
@@ -158,28 +174,23 @@ class OrderRepository {
     }
  }
 
-  Future<OrderStatusResponse?> updateOrder(updateOrderRequest request) async{
+  Future<void> updateOrder(UpdateOrderRequest request) async{
     try{
-       await _firestore.collection('orders').doc(request.orderID).update(request.toJson()).then((value) {
-       });
+      print('order id');
+      print(request.orderID);
+      var doc = await _firestore.collection('orders').doc(request.orderID).update(request.paymentStateToJson());
+      //DocumentReference _ref =  doc.reference;
 
+      // return _firestore.runTransaction( (Transaction transaction) async {
+      //   DocumentSnapshot _document = await transaction.get(_ref);
+      //   await transaction.update(_ref, request.paymentStateToJson());
+      // });
   }catch(e){
   print(e);
-  throw Exception('Error in update data !');
-  }
-  }
+  throw Exception('Error in update order payment state !');
 
-  // Future<int> getOrdersSize() async{
-  //   try{
-  //     int size = 0;
-  //   var list = await  _firestore.collection('orders').snapshots().toList();
-  //  return list.length;
-  //
-  //   }catch(e){
-  //
-  //     return 0;
-  //   }
-  // }
+  }
+  }
 
   getOwnerOrders() {
     try{
@@ -209,17 +220,6 @@ class OrderRepository {
            return map['order_id']+1;
 
       });
-     // Map<String , dynamic> map =  await _firestore.collection('utils').get().then((value) {
-     //    return {'doc_id':value.docs[0].id,
-     //    'order_id':value.docs[0].data()['customer_order_id']
-     //    };
-     //  });
-     //
-     //   await _firestore.collection('utils').doc( map['doc_id']).update({
-     //   'customer_order_id': map['order_id']+1
-     // });
-     //   int id = map['order_id']+1;
-     //   return id ;
     }catch(e){
       print('exception in generated customer id');
       return null;

@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:load/load.dart';
 import 'package:my_kom/consts/utils_const.dart';
@@ -26,7 +27,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'module_map/map_module.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-
+import '.env' as env;
 
 Future<void> backgroundHandler(RemoteMessage message)async{
   await Firebase.initializeApp();
@@ -35,16 +36,30 @@ Future<void> backgroundHandler(RemoteMessage message)async{
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  /// Stripe
+  Stripe.publishableKey = env.StripePublishableKey;
+  Stripe.merchantIdentifier = 'mykom stripe';
+  await Stripe.instance.applySettings();
+
+  /// Firebase
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
   if (defaultTargetPlatform == TargetPlatform.android) {
     AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
   }
+
+  /// di
   final container = await AppComponent.create();
+
+  ///Blocs Monitor
   BlocOverrides.runZoned(
     () {
+
       return runApp( LoadingProvider(
         themeData:LoadingThemeData() ,
+
+        /// Your App Is Here ...
         child: container.app,
       ),);
     },
@@ -52,6 +67,8 @@ void main() async {
   );
   configLoading();
 }
+
+
 void configLoading() {
   EasyLoading.instance
     ..displayDuration = const Duration(milliseconds: 2000)

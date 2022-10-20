@@ -12,6 +12,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:load/load.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:my_kom/consts/colors.dart';
 import 'package:my_kom/consts/delivery_times.dart';
 import 'package:my_kom/consts/payment_method.dart';
@@ -33,7 +34,11 @@ import 'package:my_kom/module_persistence/sharedpref/shared_preferences_helper.d
 import 'package:my_kom/module_profile/model/quick_location_model.dart';
 import 'package:my_kom/module_shoping/bloc/check_address_bloc.dart';
 import 'package:my_kom/module_shoping/bloc/my_addresses_bloc.dart';
+import 'package:my_kom/module_shoping/bloc/payment_methodes_bloc.dart';
 import 'package:my_kom/module_shoping/bloc/shopping_cart_bloc.dart';
+import 'package:my_kom/module_shoping/models/card_model.dart';
+import 'package:my_kom/module_shoping/preferences/card_icons.dart';
+import 'package:my_kom/module_shoping/widgets/card_widget.dart';
 
 import 'package:my_kom/utils/size_configration/size_config.dart';
 import 'package:my_kom/generated/l10n.dart';
@@ -53,8 +58,7 @@ class _ShopScreenState extends State<ShopScreen> {
   final NewOrderBloc _orderBloc = NewOrderBloc(OrdersService());
 
   /// controller to change the delivery address
-  late final TextEditingController _newAddressController ;
-
+  late final TextEditingController _newAddressController;
 
   /// check address state management
   /// In order to check the specified address if it is within the serviced areas
@@ -90,12 +94,12 @@ class _ShopScreenState extends State<ShopScreen> {
 
   /// To check permission to open the cart page (guests cannot view cart page)
   late final IsLogginCubit isLogginCubit;
-   String storeId = 'untitle';
+  String storeId = 'untitle';
 
   ///To save the source of the request (Dubai ..., etc)
   ///If an error occurred, we could not get the value stored in the device (Null)
 
- late String orderSource ;
+  late String orderSource;
 
   AuthPrefsHelper _authPrefsHelper = AuthPrefsHelper();
 
@@ -103,26 +107,22 @@ class _ShopScreenState extends State<ShopScreen> {
   void initState() {
     _newAddressController = TextEditingController(text: '');
     isLogginCubit = IsLogginCubit();
-    _authPrefsHelper.getAddress().then((value)  {
+    _authPrefsHelper.getAddress().then((value) {
       if (value != null) {
         addressModel = value;
         _newAddressController.text = value.description;
-
       }
     });
     _preferencesHelper.getCurrentStore().then((store) {
       if (store != null) {
         storeId = store;
-        _authPrefsHelper.getAddress().then((address)  async{
+        _authPrefsHelper.getAddress().then((address) async {
           if (address != null) {
             LatLng latLng = LatLng(address.latitude, address.longitude);
-           await _getSubAreaForAddress(latLng);
+            await _getSubAreaForAddress(latLng);
           }
         });
-      }
-      else {
-
-      }
+      } else {}
     });
 
     _authPrefsHelper.getPhone().then((value) {
@@ -164,10 +164,9 @@ class _ShopScreenState extends State<ShopScreen> {
   /// Delivery Address
   late AddressModel addressModel;
 
-
   /// Home Number
   final TextEditingController _buildingAndHomeNumberController =
-  TextEditingController(text: '');
+      TextEditingController(text: '');
 
   ///Payment method
   late String paymentGroupValue = '';
@@ -205,11 +204,8 @@ class _ShopScreenState extends State<ShopScreen> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext maincontext) {
-
     List<String> nowTitle = [
       S.of(context)!.stepOneTitle,
       S.of(context)!.stepTowTitle,
@@ -267,7 +263,9 @@ class _ShopScreenState extends State<ShopScreen> {
                     backgroundColor: Colors.white,
                     leading: IconButton(
                       icon: Icon(
-                      Platform.isIOS? Icons.arrow_back_ios: Icons.arrow_back ,
+                        Platform.isIOS
+                            ? Icons.arrow_back_ios
+                            : Icons.arrow_back,
                         color: Colors.black,
                       ),
                       onPressed: () {
@@ -322,10 +320,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                                     ]).createShader(rect);
                                               },
                                               child: Container(
-                                                width:
-                                                    80,
-                                                height:
-                                                    80,
+                                                width: 80,
+                                                height: 80,
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     color: Colors.white),
@@ -333,10 +329,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                             ),
                                             Center(
                                               child: Container(
-                                                height:
-                                                   45,
-                                                width:
-                                                   45,
+                                                height: 45,
+                                                width: 45,
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     color: Colors.white),
@@ -348,7 +342,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                                           FontWeight.w600,
                                                       color:
                                                           ColorsConst.mainColor,
-                                                      fontSize:12.5),
+                                                      fontSize: 12.5),
                                                 )),
                                               ),
                                             )
@@ -367,7 +361,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                         style: TextStyle(
                                             color: ColorsConst.mainColor,
                                             fontWeight: FontWeight.w600,
-                                            fontSize:14)),
+                                            fontSize: 14)),
                                     SizedBox(
                                       height: 6,
                                     ),
@@ -375,7 +369,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                         style: TextStyle(
                                             color: Colors.black54,
                                             fontWeight: FontWeight.w500,
-                                            fontSize:11))
+                                            fontSize: 11))
                                   ],
                                 ),
                               ),
@@ -413,7 +407,6 @@ class _ShopScreenState extends State<ShopScreen> {
             );
           }
         });
-
   }
 
   Widget _buildShoppingCard(
@@ -491,22 +484,32 @@ class _ShopScreenState extends State<ShopScreen> {
                                       ? productModel.title
                                       : productModel.title2,
                                   style: TextStyle(
-                                      fontSize:13.4,
+                                      fontSize: 13.4,
                                       fontWeight: FontWeight.w600),
                                 ),
-                                SizedBox(height: 4,),
-
-                                Text('${productModel.quantity}'+' '+  UtilsConst.lang == 'en'?'pcs':'حبة', style: TextStyle(
-                                    fontSize:13.0,
-                                    color: Colors.black54,
-                                    fontWeight: FontWeight.w600)),
-                                SizedBox(height: 4,),
+                                SizedBox(
+                                  height: 4,
+                                ),
                                 Text(
-                                  '${productModel.price}'+'  ${ UtilsConst.lang == 'en'?'AED':'د.إ'}',
-                                  style:
-                                      TextStyle(color: ColorsConst.mainColor ,
-                                        fontSize: 14
-                                        ),
+                                    '${productModel.quantity}' +
+                                                ' ' +
+                                                UtilsConst.lang ==
+                                            'en'
+                                        ? 'pcs'
+                                        : 'حبة',
+                                    style: TextStyle(
+                                        fontSize: 13.0,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w600)),
+                                SizedBox(
+                                  height: 4,
+                                ),
+                                Text(
+                                  '${productModel.price}' +
+                                      '  ${UtilsConst.lang == 'en' ? 'AED' : 'د.إ'}',
+                                  style: TextStyle(
+                                      color: ColorsConst.mainColor,
+                                      fontSize: 14),
                                 )
                               ]),
                         ),
@@ -582,7 +585,6 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Widget firstPage() {
-
     return Column(
       children: [
         SizedBox(
@@ -605,7 +607,6 @@ class _ShopScreenState extends State<ShopScreen> {
                           width: SizeConfig.screenWidth * 0.4,
                           child: Image.asset('assets/empty_cart.jpg'),
                         ),
-
                         Text(
                           S.of(context)!.emptyShip,
                           style: GoogleFonts.lato(
@@ -680,8 +681,7 @@ class _ShopScreenState extends State<ShopScreen> {
                         } else {
                           return Text('',
                               style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 14));
+                                  color: Colors.black54, fontSize: 14));
                         }
                       }),
                 ],
@@ -837,8 +837,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                 clipBehavior: Clip.antiAlias,
                                 decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    border:
-                                        Border.all(width: 2, color: Colors.blue)),
+                                    border: Border.all(
+                                        width: 2, color: Colors.blue)),
                                 child: Container(
                                     padding: EdgeInsets.all(4),
                                     clipBehavior: Clip.antiAlias,
@@ -860,13 +860,15 @@ class _ShopScreenState extends State<ShopScreen> {
                                     color: Colors.black87,
                                     fontSize: 12.5),
                               ),
-                              SizedBox(width: 20,),
+                              SizedBox(
+                                width: 20,
+                              ),
                               Text(
                                 '( ${S.of(context)!.required} )',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     color: Colors.black54,
-                                    fontSize:11.5),
+                                    fontSize: 11.5),
                               )
                             ],
                           ),
@@ -892,144 +894,152 @@ class _ShopScreenState extends State<ShopScreen> {
                                                 child: Column(
                                               children: [
                                                 Expanded(
-                                                  child:
-                                                      BlocBuilder<MyAddressesBloc,
-                                                              MyAddressesStates>(
-                                                          bloc: _myAddressesBloc,
-                                                          builder:
-                                                              (context, state) {
-                                                            if (state
-                                                                is MyAddressesSuccessState) {
-                                                              List<QuickLocationModel>
-                                                                  data =
-                                                                  state.list;
-                                                              if (data.isEmpty)
-                                                                return Center(
-                                                                  child: Column(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      Icon(
-                                                                        Icons
-                                                                            .bookmark,
-                                                                        color: Colors
-                                                                            .blue,
-                                                                        size: 22,
-                                                                      ),
-                                                                      SizedBox(
-                                                                        height: 8,
-                                                                      ),
-                                                                      Text(
-                                                                        S
-                                                                            .of(context)!
-                                                                            .nextTimeBookMark,
-                                                                        style: GoogleFonts.lato(
-                                                                            color: Colors
-                                                                                .black87,
-                                                                            fontWeight: FontWeight
-                                                                                .w600,
-                                                                            fontSize:13),
-                                                                      ),
-                                                                    ],
+                                                  child: BlocBuilder<
+                                                          MyAddressesBloc,
+                                                          MyAddressesStates>(
+                                                      bloc: _myAddressesBloc,
+                                                      builder:
+                                                          (context, state) {
+                                                        if (state
+                                                            is MyAddressesSuccessState) {
+                                                          List<QuickLocationModel>
+                                                              data = state.list;
+                                                          if (data.isEmpty)
+                                                            return Center(
+                                                              child: Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Icon(
+                                                                    Icons
+                                                                        .bookmark,
+                                                                    color: Colors
+                                                                        .blue,
+                                                                    size: 22,
                                                                   ),
-                                                                );
-                                                              else
-                                                                return ListView
-                                                                    .separated(
-                                                                        shrinkWrap:
-                                                                            true,
-                                                                        itemCount:
-                                                                            data
-                                                                                .length,
-                                                                        separatorBuilder:
-                                                                            (context,
-                                                                                index) {
-                                                                          return Divider(
-                                                                            color:
-                                                                                Colors.black87,
-                                                                          );
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    S
+                                                                        .of(context)!
+                                                                        .nextTimeBookMark,
+                                                                    style: GoogleFonts.lato(
+                                                                        color: Colors
+                                                                            .black87,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w600,
+                                                                        fontSize:
+                                                                            13),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          else
+                                                            return ListView
+                                                                .separated(
+                                                                    shrinkWrap:
+                                                                        true,
+                                                                    itemCount: data
+                                                                        .length,
+                                                                    separatorBuilder:
+                                                                        (context,
+                                                                            index) {
+                                                                      return Divider(
+                                                                        color: Colors
+                                                                            .black87,
+                                                                      );
+                                                                    },
+                                                                    itemBuilder:
+                                                                        (context,
+                                                                            index) {
+                                                                      return InkWell(
+                                                                        onTap:
+                                                                            () {
+                                                                          addressModel =
+                                                                              data[index].address;
+                                                                          print(
+                                                                              '7777777777777');
+                                                                          print(data[index]
+                                                                              .address
+                                                                              .latitude);
+                                                                          print(data[index]
+                                                                              .address
+                                                                              .longitude);
+
+                                                                          _newAddressController.text =
+                                                                              data[index].display;
+                                                                          LatLng
+                                                                              latLang =
+                                                                              LatLng(addressModel.latitude, addressModel.longitude);
+
+                                                                          /// For Check
+                                                                          _getSubAreaForAddress(
+                                                                              latLang);
+                                                                          Navigator.pop(
+                                                                              context);
                                                                         },
-                                                                        itemBuilder:
-                                                                            (context,
-                                                                                index) {
-                                                                          return InkWell(
-                                                                            onTap:
-                                                                                () {
-                                                                              addressModel =
-                                                                                  data[index].address;
-                                                                              print('7777777777777');
-                                                                              print(data[index].address.latitude);
-                                                                              print(data[index].address.longitude);
-
-                                                                              _newAddressController.text =
-                                                                                  data[index].display;
-                                                                              LatLng
-                                                                                  latLang =
-                                                                                  LatLng(addressModel.latitude, addressModel.longitude);
-
-                                                                              /// For Check
-                                                                              _getSubAreaForAddress(latLang);
-                                                                              Navigator.pop(context);
-                                                                            },
-                                                                            child:
-                                                                                Container(
-                                                                              height:
-                                                                                  35,
-                                                                              child:
-                                                                                  Row(
-                                                                                children: [
-                                                                                  Icon(
-                                                                                    Icons.bookmark_outline,
-                                                                                    color: Colors.blue,
-                                                                                    size: 15,
-                                                                                  ),
-                                                                                  SizedBox(
-                                                                                    width: 5,
-                                                                                  ),
-                                                                                  Text(
-                                                                                    data[index].display,
-                                                                                    style: GoogleFonts.lato(fontSize: 12.5, color: Colors.black),
-                                                                                  ),
-                                                                                  Spacer(),
-                                                                                  TextButton(
-                                                                                      onPressed: () {
-                                                                                        EasyLoading.show(status: S.of(context)!.pleaseWait);
-                                                                                        _myAddressesBloc.removeLocation(data[index].id).then((value) {
-                                                                                          EasyLoading.showError(S.of(context)!.removed);
-                                                                                        });
-                                                                                      },
-                                                                                      child: Text(
-                                                                                        S.of(context)!.remove,
-                                                                                        style: TextStyle( color: Colors.blue, fontSize: 12),
-                                                                                      ))
-                                                                                ],
+                                                                        child:
+                                                                            Container(
+                                                                          height:
+                                                                              35,
+                                                                          child:
+                                                                              Row(
+                                                                            children: [
+                                                                              Icon(
+                                                                                Icons.bookmark_outline,
+                                                                                color: Colors.blue,
+                                                                                size: 15,
                                                                               ),
-                                                                            ),
-                                                                          );
-                                                                        });
-                                                            } else if (state
-                                                                is MyAddressesErrorState) {
-                                                              return Center(
-                                                                  child:
-                                                                      Container(
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(10),
-                                                                child: Text(S
-                                                                    .of(context)!
-                                                                    .errorLoadLocation),
-                                                              ));
-                                                            } else
-                                                              return Center(
-                                                                child: Container(
-                                                                  height: 20,
-                                                                  width: 20,
-                                                                  child:
-                                                                    Platform.isIOS?CupertinoActivityIndicator():  CircularProgressIndicator(),
-                                                                ),
-                                                              );
-                                                          }),
+                                                                              SizedBox(
+                                                                                width: 5,
+                                                                              ),
+                                                                              Text(
+                                                                                data[index].display,
+                                                                                style: GoogleFonts.lato(fontSize: 12.5, color: Colors.black),
+                                                                              ),
+                                                                              Spacer(),
+                                                                              TextButton(
+                                                                                  onPressed: () {
+                                                                                    EasyLoading.show(status: S.of(context)!.pleaseWait);
+                                                                                    _myAddressesBloc.removeLocation(data[index].id).then((value) {
+                                                                                      EasyLoading.showError(S.of(context)!.removed);
+                                                                                    });
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    S.of(context)!.remove,
+                                                                                    style: TextStyle(color: Colors.blue, fontSize: 12),
+                                                                                  ))
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                    });
+                                                        } else if (state
+                                                            is MyAddressesErrorState) {
+                                                          return Center(
+                                                              child: Container(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    10),
+                                                            child: Text(S
+                                                                .of(context)!
+                                                                .errorLoadLocation),
+                                                          ));
+                                                        } else
+                                                          return Center(
+                                                            child: Container(
+                                                              height: 20,
+                                                              width: 20,
+                                                              child: Platform
+                                                                      .isIOS
+                                                                  ? CupertinoActivityIndicator()
+                                                                  : CircularProgressIndicator(),
+                                                            ),
+                                                          );
+                                                      }),
                                                 ),
                                                 Row(
                                                   children: [
@@ -1040,15 +1050,23 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                 context,
                                                                 MapRoutes
                                                                     .MAP_SCREEN,
-                                                                arguments: false)
+                                                                arguments:
+                                                                    false)
                                                             .then((value) {
                                                           if (value != null) {
                                                             addressModel = (value
                                                                 as AddressModel);
-                                                            _newAddressController.text =addressModel.description;
-                                                            print('in shope from map');
-                                                            print(_newAddressController.text);
-                                                            setState((){});
+                                                            _newAddressController
+                                                                    .text =
+                                                                addressModel
+                                                                    .description;
+                                                            print(
+                                                                'in shope from map');
+                                                            print(
+                                                                _newAddressController
+                                                                    .text);
+                                                            setState(() {});
+
                                                             /// Check Address
                                                             ///
 
@@ -1073,8 +1091,10 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                   TextDecoration
                                                                       .underline,
                                                               fontWeight:
-                                                                  FontWeight.bold,
-                                                              color: Colors.blue,
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  Colors.blue,
                                                               fontSize: 13.0)),
                                                     ),
                                                   ],
@@ -1086,7 +1106,10 @@ class _ShopScreenState extends State<ShopScreen> {
                                       );
                                     });
                               },
-                              child: Text(S.of(context)!.change,style: TextStyle(fontSize: 11.0),))
+                              child: Text(
+                                S.of(context)!.change,
+                                style: TextStyle(fontSize: 11.0),
+                              ))
                         ],
                       ),
                       Row(
@@ -1116,16 +1139,17 @@ class _ShopScreenState extends State<ShopScreen> {
                                 children: [
                                   Expanded(
                                     child: SizedBox(
-                                      height: 15,
-                                      child:Container(
-                                        child: Text(_newAddressController.text, style:TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.grey[600]),),
-                                      )
-                                    ),
+                                        height: 15,
+                                        child: Container(
+                                          child: Text(
+                                            _newAddressController.text,
+                                            style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey[600]),
+                                          ),
+                                        )),
                                   ),
-
                                   Container(
                                     height: 25.0,
                                     width: 25.0,
@@ -1140,9 +1164,10 @@ class _ShopScreenState extends State<ShopScreen> {
                                         builder: (context, state) {
                                           if (state is CheckAddressLoadingState)
                                             return Padding(
-                                              padding: const EdgeInsets.all(2.0),
-                                              child: CupertinoActivityIndicator()
-                                            );
+                                                padding:
+                                                    const EdgeInsets.all(2.0),
+                                                child:
+                                                    CupertinoActivityIndicator());
                                           else if (state
                                               is CheckAddressErrorState) {
                                             return Container(
@@ -1183,7 +1208,10 @@ class _ShopScreenState extends State<ShopScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
+
                       /// Building And Home Number
                       SizedBox(
                         height: 15,
@@ -1215,31 +1243,38 @@ class _ShopScreenState extends State<ShopScreen> {
                                     fontSize: 12.0,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey[600]),
-                                onChanged: (v){setState((){});},
-                                onEditingComplete: ()=>node.nextFocus(),
+                                onChanged: (v) {
+                                  setState(() {});
+                                },
+                                onEditingComplete: () => node.nextFocus(),
                                 decoration: InputDecoration(
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.symmetric(vertical: 4),
-                                  suffixIcon: Icon(
-                                    Icons.edit,
-                                    color:_buildingAndHomeNumberController.text.isNotEmpty ? Colors.blue:Colors.red,
-                                    size: 13.0,
-                                  ),
-
-
+                                    isDense: true,
+                                    contentPadding:
+                                        EdgeInsets.symmetric(vertical: 4),
+                                    suffixIcon: Icon(
+                                      Icons.edit,
+                                      color: _buildingAndHomeNumberController
+                                              .text.isNotEmpty
+                                          ? Colors.blue
+                                          : Colors.red,
+                                      size: 13.0,
+                                    ),
                                     enabledBorder: UnderlineInputBorder(
                                         borderSide: BorderSide(
-                                          color:_buildingAndHomeNumberController.text.isNotEmpty ? Colors.black12:Colors.red,)
-                                    ),
-
+                                      color: _buildingAndHomeNumberController
+                                              .text.isNotEmpty
+                                          ? Colors.black12
+                                          : Colors.red,
+                                    )),
                                     focusedBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.blue)
+                                        borderSide:
+                                            BorderSide(color: Colors.blue)),
+                                    hintText:
+                                        S.of(context)!.buildingOrHomeNumberHint,
+                                    hintStyle: TextStyle(
+                                        color: Colors.black38, fontSize: 10.5)
+                                    //S.of(context).name,
                                     ),
-
-                                  hintText: S.of(context)!.buildingOrHomeNumberHint,
-                                  hintStyle: TextStyle(color:Colors.black38,fontSize: 10.5)
-                                  //S.of(context).name,
-                                ),
                                 // validator: (_h){
                                 //   if(_h!.isEmpty)return '';
                                 //   else return null;
@@ -1251,7 +1286,10 @@ class _ShopScreenState extends State<ShopScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 15,),
+                      SizedBox(
+                        height: 15,
+                      ),
+
                       /// Phone Number Section
                       SizedBox(
                         height: 15,
@@ -1259,7 +1297,7 @@ class _ShopScreenState extends State<ShopScreen> {
                           children: [
                             Icon(
                               Icons.phone,
-                              color:Colors.blue,
+                              color: Colors.blue,
                               size: 13.0,
                             ),
                             SizedBox(
@@ -1283,28 +1321,37 @@ class _ShopScreenState extends State<ShopScreen> {
                                     fontSize: 12.0,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey[600]),
-                                onChanged: (v){setState((){});},
-                                onEditingComplete: ()=>node.unfocus(),
+                                onChanged: (v) {
+                                  setState(() {});
+                                },
+                                onEditingComplete: () => node.unfocus(),
                                 decoration: InputDecoration(
-                                  isDense: true,
-                                    contentPadding: EdgeInsets.symmetric(vertical: 4),
-                                  suffixIcon: Icon(
-                                    Icons.edit,
-                                    color: _phoneController.text.isNotEmpty ? Colors.blue:Colors.red,
-                                    size: 13.0,
-                                  ),
-
+                                    isDense: true,
+                                    contentPadding:
+                                        EdgeInsets.symmetric(vertical: 4),
+                                    suffixIcon: Icon(
+                                      Icons.edit,
+                                      color: _phoneController.text.isNotEmpty
+                                          ? Colors.blue
+                                          : Colors.red,
+                                      size: 13.0,
+                                    ),
                                     enabledBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: _phoneController.text.isNotEmpty ? Colors.black12:Colors.red,)
-                                    ),
+                                        borderSide: BorderSide(
+                                      color: _phoneController.text.isNotEmpty
+                                          ? Colors.black12
+                                          : Colors.red,
+                                    )),
                                     focusedBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.blue)
+                                        borderSide:
+                                            BorderSide(color: Colors.blue)),
+                                    hintText: UtilsConst.lang == 'en'
+                                        ? 'enter phone number'
+                                        : 'أدخل رقم الهاتف',
+                                    hintStyle: TextStyle(
+                                        color: Colors.black38, fontSize: 10.5)
+                                    //S.of(context).name,
                                     ),
-
-                                    hintText: UtilsConst.lang == 'en' ? 'enter phone number':'أدخل رقم الهاتف'
-                                    ,hintStyle: TextStyle(color:Colors.black38,fontSize: 10.5)
-                                  //S.of(context).name,
-                                ),
                                 // validator: (_p){
                                 //   if(_p!.isEmpty)return '';
                                 //   else return null;
@@ -1316,13 +1363,10 @@ class _ShopScreenState extends State<ShopScreen> {
                           ],
                         ),
                       ),
-
-
                     ],
                   ),
                 ),
               ),
-
 
               ///  Address Worn
               BlocConsumer<CheckAddressBloc, CheckAddressStates>(
@@ -1336,7 +1380,7 @@ class _ShopScreenState extends State<ShopScreen> {
                             ' ' +
                             _savedNameLocationController.text.trim();
                         _savedNameLocationController.clear();
-                        setState((){});
+                        setState(() {});
                       }
                     } else if (listenerCheckAddState
                         is CheckAddressErrorState) {
@@ -1348,8 +1392,10 @@ class _ShopScreenState extends State<ShopScreen> {
                       return Container(
                           height: 24.0,
                           width: double.maxFinite,
-                          margin: EdgeInsets.only(left:  SizeConfig.widhtMulti * 5 , right:   SizeConfig.widhtMulti * 5 , top: 8),
-
+                          margin: EdgeInsets.only(
+                              left: SizeConfig.widhtMulti * 5,
+                              right: SizeConfig.widhtMulti * 5,
+                              top: 8),
                           padding: EdgeInsets.symmetric(vertical: 5),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
@@ -1366,7 +1412,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       return Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20),
                         child: MaterialButton(
-                          height: 20.0,
+                            height: 20.0,
                             elevation: 1,
                             onPressed: () {
                               /// Save Location
@@ -1384,36 +1430,39 @@ class _ShopScreenState extends State<ShopScreen> {
                                                 BorderRadius.circular(20),
                                           ),
                                           content: Container(
-                                            height:100,
+                                            height: 100,
                                             width: SizeConfig.screenWidth,
                                             child: Center(
                                                 child: Column(
                                               children: [
                                                 Expanded(
                                                   child: SizedBox(
-
                                                     child: TextField(
                                                       controller:
                                                           _savedNameLocationController,
                                                       style: TextStyle(
                                                           fontSize: 13),
-
-                                                      decoration: InputDecoration(
-                                                        isDense: true,
-                                                        contentPadding: EdgeInsets.all(8),
-                                                          border:
-                                                              OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(10),
-                                                          ),
-                                                          hintText: S
-                                                              .of(context)!
-                                                              .hintTextBookMarkField,
-                                                          hintStyle: TextStyle(
-                                                              fontSize: 11.5,
-                                                              color: Colors
-                                                                  .black38)),
+                                                      decoration:
+                                                          InputDecoration(
+                                                              isDense: true,
+                                                              contentPadding:
+                                                                  EdgeInsets.all(
+                                                                      8),
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10),
+                                                              ),
+                                                              hintText: S
+                                                                  .of(context)!
+                                                                  .hintTextBookMarkField,
+                                                              hintStyle: TextStyle(
+                                                                  fontSize:
+                                                                      11.5,
+                                                                  color: Colors
+                                                                      .black38)),
                                                     ),
                                                   ),
                                                 ),
@@ -1592,13 +1641,15 @@ class _ShopScreenState extends State<ShopScreen> {
                                           fontSize: 12.5,
                                           fontWeight: FontWeight.w800,
                                           color: Colors.black87)),
-                                  SizedBox(width: 20,),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
                                   Text(
                                     '( ${S.of(context)!.optional} )',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         color: Colors.black54,
-                                        fontSize:11.5),
+                                        fontSize: 11.5),
                                   )
                                 ],
                               ),
@@ -1629,9 +1680,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                   SizedBox(
                                     child: FlutterSwitch(
                                       activeColor: ColorsConst.mainColor,
-
                                       width: 60,
-                                      height:20.0,
+                                      height: 20.0,
                                       valueFontSize: 11.0,
                                       toggleSize: 20.0,
                                       value: vipOrder,
@@ -1639,14 +1689,14 @@ class _ShopScreenState extends State<ShopScreen> {
                                       padding: 1,
                                       showOnOff: false,
                                       onToggle: (val) {
-                                              setState(() {
-                                                vipOrder = val;
-                                                if (vipOrder) {
-                                                  vipOrderValue = 10.0;
-                                                } else {
-                                                  vipOrderValue = 0.0;
-                                                }
-                                              });
+                                        setState(() {
+                                          vipOrder = val;
+                                          if (vipOrder) {
+                                            vipOrderValue = 10.0;
+                                          } else {
+                                            vipOrderValue = 0.0;
+                                          }
+                                        });
                                       },
                                     ),
                                   )
@@ -1674,7 +1724,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    height:25.0,
+                                    height: 25.0,
                                     width: 25.0,
                                     clipBehavior: Clip.antiAlias,
                                     padding: EdgeInsets.all(2),
@@ -1733,17 +1783,14 @@ class _ShopScreenState extends State<ShopScreen> {
                                     child: FlutterSwitch(
                                       disabled: true,
                                       width: 60,
-                                      height:20.0,
+                                      height: 20.0,
                                       valueFontSize: 11.0,
                                       toggleSize: 20.0,
                                       value: vipOrder,
                                       borderRadius: 30.0,
                                       padding: 1,
                                       showOnOff: true,
-
-                                      onToggle: (val) {
-
-                                      },
+                                      onToggle: (val) {},
                                     ),
                                   )
                                 ],
@@ -1765,7 +1812,6 @@ class _ShopScreenState extends State<ShopScreen> {
 
               /// Note
               Container(
-
                 margin: EdgeInsets.symmetric(horizontal: 8),
                 padding: EdgeInsets.all(8),
                 width: double.maxFinite,
@@ -1776,9 +1822,7 @@ class _ShopScreenState extends State<ShopScreen> {
                     //   color: Colors.black38
                     // ),
                     boxShadow: [
-                      BoxShadow(
-                          offset: Offset(0, -1),
-                          color: Colors.black12),
+                      BoxShadow(offset: Offset(0, -1), color: Colors.black12),
                       BoxShadow(
                           blurRadius: 1,
                           offset: Offset(0, 1),
@@ -1820,15 +1864,17 @@ class _ShopScreenState extends State<ShopScreen> {
                           style: TextStyle(
                               fontWeight: FontWeight.w800,
                               color: Colors.black87,
-                              fontSize:12.5),
+                              fontSize: 12.5),
                         ),
-                        SizedBox(width: 20,),
+                        SizedBox(
+                          width: 20,
+                        ),
                         Text(
                           '( ${S.of(context)!.optional} )',
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: Colors.black54,
-                              fontSize:11.5),
+                              fontSize: 11.5),
                         )
                       ],
                     ),
@@ -1846,9 +1892,9 @@ class _ShopScreenState extends State<ShopScreen> {
                       decoration: InputDecoration(
                           contentPadding: EdgeInsets.all(8),
                           hintText: S.of(context)!.noteMessage,
-
                           border: InputBorder.none,
-                          hintStyle: TextStyle(color: Colors.black26,fontSize: 11)
+                          hintStyle:
+                              TextStyle(color: Colors.black26, fontSize: 11)
                           //S.of(context).name,
                           ),
 
@@ -1915,21 +1961,18 @@ class _ShopScreenState extends State<ShopScreen> {
                       //       curve: Curves.ease);
                       // }
                       //   else {
-                      if(_buildingAndHomeNumberController.text.trim().isNotEmpty && _phoneController.text.trim().isNotEmpty){
+                      if (_buildingAndHomeNumberController.text
+                              .trim()
+                              .isNotEmpty &&
+                          _phoneController.text.trim().isNotEmpty) {
                         node.unfocus();
                         _pageController.nextPage(
                             duration: Duration(milliseconds: 200),
                             curve: Curves.ease);
-                      }
-
-
-
-                      else
-                        _scaffoldState.currentState!
-                            .showSnackBar(SnackBar(
-                            content: Text(S
-                                .of(context)!
-                                .requiredCartFieldMessage)));
+                      } else
+                        _scaffoldState.currentState!.showSnackBar(SnackBar(
+                            content:
+                                Text(S.of(context)!.requiredCartFieldMessage)));
                       // }
                     },
                     child: Text(
@@ -1974,9 +2017,7 @@ class _ShopScreenState extends State<ShopScreen> {
                     //   color: Colors.black38,
                     // ),
                     boxShadow: [
-                      BoxShadow(
-                          offset: Offset(0, -1),
-                          color: Colors.black12),
+                      BoxShadow(offset: Offset(0, -1), color: Colors.black12),
                       BoxShadow(
                           blurRadius: 1,
                           offset: Offset(0, 1),
@@ -2027,7 +2068,7 @@ class _ShopScreenState extends State<ShopScreen> {
                         Text(
                           S.of(context)!.total,
                           style: GoogleFonts.lato(
-                              fontSize:11,
+                              fontSize: 11,
                               fontWeight: FontWeight.w800,
                               color: Colors.black54),
                         ),
@@ -2035,7 +2076,8 @@ class _ShopScreenState extends State<ShopScreen> {
                             bloc: shopCartBloc,
                             builder: (context, state) {
                               if (state is CartLoaded) {
-                                return Text('${state.cart.totalString}  ${UtilsConst.lang == 'en'? 'AED':'د.إ'}' ,
+                                return Text(
+                                    '${state.cart.totalString}  ${UtilsConst.lang == 'en' ? 'AED' : 'د.إ'}',
                                     style: GoogleFonts.lato(
                                         fontSize: 11.5,
                                         fontWeight: FontWeight.w800,
@@ -2043,8 +2085,7 @@ class _ShopScreenState extends State<ShopScreen> {
                               } else {
                                 return Text('',
                                     style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize:11));
+                                        color: Colors.black54, fontSize: 11));
                               }
                             }),
                       ],
@@ -2066,7 +2107,8 @@ class _ShopScreenState extends State<ShopScreen> {
                             bloc: shopCartBloc,
                             builder: (context, state) {
                               if (state is CartLoaded) {
-                                return Text('${vipOrderValue.toString()}  ${UtilsConst.lang == 'en'? 'AED':'د.إ'}',
+                                return Text(
+                                    '${vipOrderValue.toString()}  ${UtilsConst.lang == 'en' ? 'AED' : 'د.إ'}',
                                     style: GoogleFonts.lato(
                                         fontSize: 11.5,
                                         fontWeight: FontWeight.w800,
@@ -2074,8 +2116,7 @@ class _ShopScreenState extends State<ShopScreen> {
                               } else {
                                 return Text('',
                                     style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 11));
+                                        color: Colors.black54, fontSize: 11));
                               }
                             }),
                       ],
@@ -2102,16 +2143,16 @@ class _ShopScreenState extends State<ShopScreen> {
                                     vipOrderValue + state.cart.subTotal;
 
                                 orderValue = total;
-                                return Text('${total.toString()}  ${ UtilsConst.lang == 'en'?'AED':'د.إ'}',
+                                return Text(
+                                    '${total.toString()}  ${UtilsConst.lang == 'en' ? 'AED' : 'د.إ'}',
                                     style: GoogleFonts.lato(
-                                        fontSize:12,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w800,
                                         color: Colors.green));
                               } else {
                                 return Text('',
                                     style: TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 11));
+                                        color: Colors.black54, fontSize: 11));
                               }
                             }),
                       ],
@@ -2153,9 +2194,9 @@ class _ShopScreenState extends State<ShopScreen> {
                                     ),
                                     child: Center(
                                         child: Text(
-                                            '${S.of(context)!.minimumAlert}  ${state.cart.minimum_pursh} ${ UtilsConst.lang == 'en'?'AED':'د.إ'} ',
+                                            '${S.of(context)!.minimumAlert}  ${state.cart.minimum_pursh} ${UtilsConst.lang == 'en' ? 'AED' : 'د.إ'} ',
                                             style: GoogleFonts.lato(
-                                                fontSize:11.0,
+                                                fontSize: 11.0,
                                                 fontWeight: FontWeight.w800,
                                                 color: Colors.red))))));
                       } else
@@ -2182,12 +2223,10 @@ class _ShopScreenState extends State<ShopScreen> {
                     //     color: Colors.black38
                     // ),
                     boxShadow: [
-                      BoxShadow(
-                          offset: Offset(0, -1),
-                          color: Colors.black12),
+                      BoxShadow(offset: Offset(0, -1), color: Colors.black12),
                       BoxShadow(
                           blurRadius: 1,
-                          offset: Offset(0,1),
+                          offset: Offset(0, 1),
                           color: Colors.black38)
                     ],
                     borderRadius: BorderRadius.circular(10)),
@@ -2242,7 +2281,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                 : 0,
                             child: Container(
                               width: SizeConfig.screenWidth * 0.24,
-                              height:80,
+                              height: 80,
                               clipBehavior: Clip.antiAlias,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
@@ -2253,12 +2292,11 @@ class _ShopScreenState extends State<ShopScreen> {
                                   border: Border.all(color: Colors.black12)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
                                     height: 35,
-                                   width: SizeConfig.screenWidth * 0.24,
+                                    width: SizeConfig.screenWidth * 0.24,
                                     clipBehavior: Clip.antiAlias,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
@@ -2279,19 +2317,18 @@ class _ShopScreenState extends State<ShopScreen> {
                                   ),
                                   Center(
                                     child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 4.0,vertical: 8.0),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 4.0, vertical: 8.0),
                                         child: Text(
-                                         S.of(context)!.cashMoney,
+                                          S.of(context)!.cashMoney,
                                           textAlign: TextAlign.center,
-
                                           style: GoogleFonts.lato(
-
                                               color: paymentGroupValue ==
                                                       PaymentMethodConst
                                                           .CASH_MONEY
                                                   ? Colors.white
                                                   : Colors.black54,
-                                              fontSize:9.5,
+                                              fontSize: 9.5,
                                               fontWeight: FontWeight.bold),
                                         )),
                                   )
@@ -2321,7 +2358,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                 : 0,
                             child: Container(
                               width: SizeConfig.screenWidth * 0.24,
-                              height:80,
+                              height: 80,
                               clipBehavior: Clip.antiAlias,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
@@ -2331,8 +2368,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                       : Colors.white,
                                   border: Border.all(color: Colors.black12)),
                               child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
                                     height: 35,
@@ -2357,7 +2393,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                   ),
                                   Center(
                                     child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 4.0,vertical: 8.0),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 4.0, vertical: 8.0),
                                         child: Text(
                                           S.of(context)!.creditCard,
                                           textAlign: TextAlign.center,
@@ -2367,8 +2404,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                                           .CREDIT_CARD
                                                   ? Colors.white
                                                   : Colors.black54,
-                                              fontSize:
-                                                 10,
+                                              fontSize: 10,
                                               fontWeight: FontWeight.bold),
                                         )),
                                   )
@@ -2390,7 +2426,7 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
         )),
         Container(
-          height:35,
+          height: 35,
           margin: EdgeInsets.symmetric(
               horizontal: SizeConfig.widhtMulti * 3, vertical: 5),
           child: Row(
@@ -2427,7 +2463,7 @@ class _ShopScreenState extends State<ShopScreen> {
               ),
               Expanded(
                   child: Container(
-                    height: 35.0,
+                      height: 35.0,
                       clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
                           color: ColorsConst.mainColor,
@@ -2452,8 +2488,7 @@ class _ShopScreenState extends State<ShopScreen> {
                               hideLoadingDialog();
                               snackBarSuccessWidget(
                                   context, S.of(context)!.orderWasNotAdded);
-                            }
-                            else if(state is CreateOrderLoadingState){
+                            } else if (state is CreateOrderLoadingState) {
                               showCustomLoadingWidget(
                                 Center(
                                   child: Container(
@@ -2465,15 +2500,18 @@ class _ShopScreenState extends State<ShopScreen> {
                                           width: 40,
                                           height: 40,
                                           color: Colors.transparent,
-                                          child: Platform.isIOS?CupertinoActivityIndicator(
-                                            radius: 12,
-                                            color:  Colors.white,
-                                          ):CircularProgressIndicator(color: Colors.white,),
+                                          child: Platform.isIOS
+                                              ? CupertinoActivityIndicator(
+                                                  radius: 12,
+                                                  color: Colors.white,
+                                                )
+                                              : CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                ),
                                         ),
                                         Container(
                                           height: 10,
                                         ),
-
                                       ],
                                     ),
                                   ),
@@ -2498,11 +2536,15 @@ class _ShopScreenState extends State<ShopScreen> {
                               child: isLoading
                                   ? Center(
                                       child: Container(
-                                      height:20,
+                                      height: 20,
                                       width: 20,
-                                      child:Platform.isIOS? CupertinoActivityIndicator(color: Colors.white,): CircularProgressIndicator(
-                                        color: Colors.white,
-                                      ),
+                                      child: Platform.isIOS
+                                          ? CupertinoActivityIndicator(
+                                              color: Colors.white,
+                                            )
+                                          : CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
                                     ))
                                   : MaterialButton(
                                       onPressed: () async {
@@ -2527,306 +2569,535 @@ class _ShopScreenState extends State<ShopScreen> {
                                                       .paymentMethodAlert)));
                                         } else if (paymentGroupValue ==
                                             PaymentMethodConst.CREDIT_CARD) {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return ClipRRect(
+                                          PaymentMethodsBloc
+                                              paymentMethodeNumberBloc =
+                                              PaymentMethodsBloc();
+                                          paymentMethodeNumberBloc.getCards();
+
+                                          showMaterialModalBottomSheet(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(30),
+                                                  topRight:
+                                                      Radius.circular(30)),
+                                            ),
+                                            context: context,
+                                            builder: (context) =>
+                                                SingleChildScrollView(
+                                              controller:
+                                                  ModalScrollController.of(
+                                                      context),
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 10),
+                                                height:
+                                                    SizeConfig.screenHeight *
+                                                        0.6,
+                                                clipBehavior: Clip.antiAlias,
+                                                decoration: BoxDecoration(
                                                   borderRadius:
-                                                  BorderRadius.circular(20),
-                                                  child: AlertDialog(
-                                                    backgroundColor: Colors
-                                                        .white
-                                                        .withOpacity(0.8),
-                                                    clipBehavior:
-                                                    Clip.antiAlias,
-                                                    shape:
-                                                    RoundedRectangleBorder(
-                                                      borderRadius:
-                                                      BorderRadius.circular(
-                                                          20),
-                                                    ),
-                                                    content: Container(
-                                                      height: 70,
-                                                      width: 90,
-                                                      child: Center(
-                                                        child: Text(
-                                                          S
-                                                              .of(context)!
-                                                              .creditComingSoon,
-                                                          style:
-                                                          GoogleFonts.acme(
-                                                              color: Colors
-                                                                  .green,
-                                                              fontWeight:
-                                                              FontWeight
-                                                                  .bold),
-                                                        ),
+                                                      BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  30),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  30)),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    IconButton(
+                                                        onPressed: () {
+                                                          Navigator.of(
+                                                              context)
+                                                              .pop();
+                                                        },
+                                                        icon: Icon(
+                                                          Icons.clear,
+                                                          size: 20,
+                                                        )),
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal:
+                                                          16.0),
+                                                      child: Text(
+                                                        S
+                                                            .of(context)!
+                                                            .payByCard,
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .black54,
+                                                            fontWeight:
+                                                            FontWeight
+                                                                .bold,
+                                                            fontSize:
+                                                            18),
                                                       ),
                                                     ),
-                                                  ),
-                                                );
-                                              });
+                                                    SizedBox(
+                                                      height: 15,
+                                                    ),
+                                                    Expanded(
+                                                      child: BlocConsumer<
+                                                              PaymentMethodsBloc,
+                                                              PaymentMethodsState>(
+                                                          bloc:
+                                                              paymentMethodeNumberBloc,
+                                                          listener: (context,state){
+                                                            if(state.state == PaymentMethodsStates.success_deleted)
+                                                              Fluttertoast.showToast(msg: 'successfully deleted',
+                                                                textColor:Colors.white,
+                                                                  gravity: ToastGravity.TOP,
+                                                                backgroundColor:ColorsConst.mainColor,
+                                                                toastLength: Toast.LENGTH_LONG
+                                                              );
+                                                             else if(state.state == PaymentMethodsStates.error_deleted)
+                                                              Fluttertoast.showToast(msg: 'an error occurred',
+                                                                  textColor:Colors.white,
+                                                                  gravity: ToastGravity.TOP,
+                                                                  backgroundColor:Colors.red,
+                                                                  toastLength: Toast.LENGTH_LONG
+                                                              );
+
+                                                          },
+                                                          builder: (context, state) {
+                                                            if (state.state ==
+                                                                PaymentMethodsStates
+                                                                    .error) {
+                                                              return Center(
+                                                                child: Column(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    Text(
+                                                                        'Error in load your cards, click on refresh!'),
+                                                                    SizedBox(
+                                                                      height: 16,
+                                                                    ),
+                                                                    IconButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          paymentMethodeNumberBloc
+                                                                              .getCards();
+                                                                        },
+                                                                        icon: Icon(Icons
+                                                                            .refresh))
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            } else if (state.state ==
+                                                                PaymentMethodsStates
+                                                                    .loading) {
+                                                              return Center(
+                                                                child: Container(
+                                                                  height: 25,
+                                                                  width: 25,
+                                                                  child: Platform
+                                                                          .isIOS
+                                                                      ? CupertinoActivityIndicator()
+                                                                      : CircularProgressIndicator(
+                                                                          color: Colors
+                                                                              .black54,
+                                                                        ),
+                                                                ),
+                                                              );
+                                                            } else if (state.state ==
+                                                                PaymentMethodsStates
+                                                                    .success)
+                                                              return Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+
+                                                                  Container(
+                                                                    constraints: BoxConstraints(
+                                                                      minHeight: 50,
+                                                                      maxHeight: 250
+                                                                    ),
+                                                                    margin: EdgeInsets
+                                                                        .symmetric(
+                                                                            horizontal:
+                                                                                20),
+                                                                    child: ListView
+                                                                        .separated(
+
+                                                                      separatorBuilder:
+                                                                          (context,
+                                                                              index) {
+                                                                        return SizedBox(
+                                                                          height: 8,
+                                                                        );
+                                                                      },
+                                                                      shrinkWrap:
+                                                                          true,
+                                                                      itemCount: state
+                                                                          .cards
+                                                                          .length,
+                                                                      itemBuilder:
+                                                                          (context,
+                                                                              index) {
+                                                                        CardModel
+                                                                            card =
+                                                                            state.cards[
+                                                                                index];
+                                                                        print('from state');
+                                                                        print(card.cardId.length);
+                                                                        return Center(
+                                                                          child:
+                                                                              Container(
+                                                                            width: double
+                                                                                .infinity,
+                                                                            height:
+                                                                                40,
+                                                                            decoration: BoxDecoration(
+                                                                                borderRadius: BorderRadius.circular(
+                                                                                    10),
+                                                                                color: Colors
+                                                                                    .grey
+                                                                                    .shade50,
+                                                                                border: Border.all(
+                                                                                    color: Colors.black26,
+                                                                                    width: 2)),
+                                                                            child:
+                                                                                Row(
+                                                                              mainAxisSize:
+                                                                                  MainAxisSize.min,
+                                                                              children: [
+                                                                                Radio<
+                                                                                    String>(
+                                                                                  value:
+                                                                                      card.cardId,
+                                                                                  groupValue:
+                                                                                      paymentMethodeNumberBloc.state.paymentMethodeCreditGroupValue,
+                                                                                  onChanged:
+                                                                                      (value) {
+                                                                                    paymentMethodeNumberBloc.changeSelect(value!);
+                                                                                  },
+                                                                                  activeColor:
+                                                                                      Colors.green,
+                                                                                ),
+                                                                                CardIcons.getIcon(brand: card.type) == null?
+
+                                                                                Container(
+                                                                                  width: 30,
+                                                                                  padding: EdgeInsets.all(2),
+                                                                                    decoration: BoxDecoration(
+                                                                                      border: Border.all(
+                                                                                        color: Colors.black38,
+                                                                                      )
+                                                                                    ),
+                                                                                    child: Text(card.type,style: TextStyle(color: Colors.black54,fontWeight: FontWeight.w700,),)):
+
+                                                                                Container(
+                                                                                  width: 30,
+                                                                                    child: Image.asset(CardIcons.getIcon(brand: card.type).toString(),fit: BoxFit.cover,)),
+                                                                                SizedBox(
+                                                                                  width:
+                                                                                      10,
+                                                                                ),
+                                                                                Text(
+                                                                                  ' **** **** **** '+ card.cardNumber,
+                                                                                  textAlign: TextAlign.center,
+                                                                                  style: GoogleFonts.acme(
+                                                                                      color: Colors.black54,
+                                                                                      fontSize: 14,
+                                                                                      fontWeight: FontWeight.w500),
+                                                                                ),
+                                                                                Spacer(),
+                                                                                IconButton(
+                                                                                    onPressed: () {
+                                                                                      paymentMethodeNumberBloc.removeOne(state.cards[index]);
+                                                                                    },
+                                                                                    icon: Icon(
+                                                                                      Icons.delete,
+                                                                                      color: Colors.red,
+                                                                                    )),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 25,
+                                                                  ),
+                                                                  Center(
+                                                                    child:
+                                                                        Column(
+                                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                                          mainAxisSize: MainAxisSize.min,
+                                                                          children: [
+                                                                            GestureDetector(
+                                                                      onTap:
+                                                                              () async {
+                                                                            /// Card Widget
+                                                                            showCardWidget(
+                                                                                context,
+                                                                                paymentMethodeNumberBloc);
+                                                                      },
+                                                                      child:
+                                                                              Container(
+                                                                            margin: EdgeInsets
+                                                                                .symmetric(
+                                                                                    horizontal:
+                                                                                        20),
+                                                                            width: SizeConfig
+                                                                                .screenWidth,
+                                                                            height: 35,
+                                                                            decoration: BoxDecoration(
+                                                                                borderRadius:
+                                                                                    BorderRadius.circular(
+                                                                                        10),
+                                                                                color: Colors
+                                                                                    .grey
+                                                                                    .shade50,
+                                                                                border: Border.all(
+                                                                                    color: Colors
+                                                                                        .black26,
+                                                                                    width:
+                                                                                        2)),
+                                                                            child: Row(
+                                                                              mainAxisSize:
+                                                                                  MainAxisSize
+                                                                                      .min,
+                                                                              children: [
+                                                                                Padding(
+                                                                                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                                                                  child: Icon(Icons
+                                                                                      .add,size: 18,),
+                                                                                ),
+
+                                                                                Text(
+                                                                                  S
+                                                                                      .of(context)!
+                                                                                      .addCard,
+                                                                                  style: GoogleFonts.lato(
+                                                                                      color: Colors
+                                                                                          .black54,
+                                                                                      fontSize:
+                                                                                          14,
+                                                                                      fontWeight:
+                                                                                          FontWeight.bold),
+                                                                                )
+                                                                              ],
+                                                                            ),
+                                                                      ),
+                                                                    ),
+                                                                            SizedBox(height: 16.0,)
+                                                                            ,Center(
+                                                                              child: Container(
+                                                                                margin: EdgeInsets
+                                                                                    .symmetric(
+                                                                                    horizontal:
+                                                                                    20),
+                                                                                width: SizeConfig
+                                                                                    .screenWidth,
+                                                                                child: Row(
+
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    Icon(Icons.info,color: Colors.black87,size: 14.0,),
+                                                                                    Expanded(child: Padding(
+                                                                                      padding:  EdgeInsets.symmetric(horizontal: 8),
+                                                                                      child: Text('Important: The application dose not save the card data',style: TextStyle(color: Colors.black45,fontSize: 11.0,decoration: TextDecoration.underline),),
+                                                                                    )),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                  ),
+                                                                  Spacer(),
+                                                                  Center(
+                                                                    child: BlocConsumer<
+                                                                            NewOrderBloc,
+                                                                            CreateOrderStates>(
+                                                                        bloc:
+                                                                            _orderBloc,
+                                                                        listener:
+                                                                            (context,
+                                                                                state) async {
+                                                                          if (state
+                                                                              is CreateOrderSuccessState) {
+                                                                            snackBarSuccessWidget(
+                                                                                context,
+                                                                                S.of(context)!.orderAddedSuccessfully);
+                                                                            Navigator.pushAndRemoveUntil(
+                                                                                context,
+                                                                                MaterialPageRoute(
+                                                                                    builder: (context) => CompleteOrderScreen(orderId: state.data.id)),
+                                                                                (route) => false);
+                                                                            shopCartBloc
+                                                                                .startedShop();
+                                                                          } else if (state
+                                                                              is CreateOrderErrorState) {
+                                                                            snackBarErrorWidget(
+                                                                                context,
+                                                                                state.message);
+                                                                          }
+                                                                        },
+                                                                        builder:
+                                                                            (context,
+                                                                                state) {
+                                                                          bool isLoading = state
+                                                                                  is CreateOrderLoadingState
+                                                                              ? true
+                                                                              : false;
+                                                                          return AnimatedContainer(
+                                                                            duration: Duration(
+                                                                                milliseconds:
+                                                                                    200),
+                                                                            clipBehavior:
+                                                                                Clip.antiAlias,
+                                                                            height:
+                                                                                35.0,
+                                                                            width: isLoading
+                                                                                ? 60
+                                                                                : SizeConfig.screenWidth *
+                                                                                    0.8,
+                                                                            padding: EdgeInsets.all(
+                                                                                isLoading
+                                                                                    ? 8
+                                                                                    : 0),
+                                                                            margin: EdgeInsets.symmetric(
+                                                                                horizontal:
+                                                                                    20),
+                                                                            decoration: BoxDecoration(
+                                                                                color: ColorsConst
+                                                                                    .mainColor,
+                                                                                borderRadius:
+                                                                                    BorderRadius.circular(10)),
+                                                                            child: isLoading
+                                                                                ? Center(
+                                                                                    child: Container(
+                                                                              height: 25,
+                                                                              width: 25,
+                                                                              child: Platform
+                                                                                  .isIOS
+                                                                                  ? CupertinoActivityIndicator(color: Colors.white,)
+                                                                                  : CircularProgressIndicator(
+                                                                                color: Colors.white,
+                                                                              ),
+
+                                                                                  ))
+                                                                                : MaterialButton(
+                                                                                    onPressed: () {
+                                                                                      cardId = paymentMethodeNumberBloc.state.paymentMethodeCreditGroupValue;
+                                                                                      if (cardId == '') {
+                                                                                        Fluttertoast.showToast(msg: S.of(context)!.selectCardAlert, toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.TOP, timeInSecForIosWeb: 1, backgroundColor: Colors.white, textColor: Colors.black, fontSize: 18.0);
+                                                                                      } else {
+                                                                                        /// Here Add Order
+                                                                                        GeoJson geoJson = GeoJson(lat: addressModel.latitude, lon: addressModel.longitude);
+
+                                                                                        _orderBloc.addNewOrder(
+                                                                                          product: requestProduct,
+                                                                                          deliveryTimes: deliveryTimesGroupValue,
+                                                                                          orderType: vipOrder,
+                                                                                          destination: geoJson,
+                                                                                          addressName: addressModel.description,
+                                                                                          phoneNumber: _phoneController.text.trim(),
+                                                                                          paymentMethod: paymentGroupValue,
+                                                                                          numberOfMonth: numberOfMonth,
+                                                                                          orderValue: orderValue,
+                                                                                          cardId: cardId,
+                                                                                          storeId: storeId,
+                                                                                          note: _noteController.text.trim(),
+                                                                                          buildingHomeId: _buildingAndHomeNumberController.text.trim(),
+                                                                                        );
+                                                                                      }
+                                                                                    },
+                                                                                    child: Text(
+                                                                                      S.of(context)!.orderConfirmation,
+                                                                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15.0),
+                                                                                    ),
+                                                                                  ),
+                                                                          );
+                                                                        }),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: SizeConfig
+                                                                            .screenHeight *
+                                                                        0.05,
+                                                                  )
+                                                                ],
+                                                              );
+                                                            else
+                                                              return SizedBox
+                                                                  .shrink();
+                                                          }),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
                                         }
-                                          //       /// For Credits Cards
-        //
-        // showMaterialModalBottomSheet(
-        //   shape: RoundedRectangleBorder(
-        //     borderRadius: BorderRadius.only(topLeft: Radius.circular(30),
-        //         topRight: Radius.circular(30)
-        //     ),
-        //   ),
-        //   context: context,
-        //   builder: (context) => SingleChildScrollView(
-        //     controller: ModalScrollController.of(context),
-        //     child: BlocBuilder<PaymentMethodeNumberBloc,PaymentState>(
-        //         bloc: paymentMethodeNumberBloc,
-        //         builder: (context,state) {
-        //           return Container(
-        //             padding: EdgeInsets.symmetric(horizontal: 10),
-        //             height: SizeConfig.screenHeight * 0.8 ,
-        //             clipBehavior: Clip.antiAlias,
-        //             decoration: BoxDecoration(
-        //               borderRadius: BorderRadius.only(topLeft: Radius.circular(30),
-        //                   topRight: Radius.circular(30)
-        //               ),
-        //             ),
-        //             child: Column(
-        //               crossAxisAlignment: CrossAxisAlignment.start,
-        //               children: [
-        //                 IconButton(onPressed: (){
-        //                   Navigator.of(context).pop();
-        //                 }, icon:Icon(Icons.clear) ),
-        //                 Text(S.of(context)!.payByCard , style:TextStyle(
-        //
-        //                     color: Colors.black54,
-        //                     fontWeight: FontWeight.bold,
-        //                     fontSize: SizeConfig.titleSize*2.9
-        //
-        //                 ),),
-        //                 SizedBox(height: 15,),
-        //                 Container(
-        //                   margin: EdgeInsets.symmetric(horizontal: 20),
-        //
-        //                   child: ListView.separated(
-        //                     separatorBuilder: (context,index){
-        //                       return  SizedBox(height: 8,);
-        //                     },
-        //                     shrinkWrap:true ,
-        //                     itemCount: state.cards.length,
-        //                     itemBuilder: (context,index){
-        //                       CardModel  card =   state.cards[index];
-        //                       return   Center(
-        //                         child: Container(
-        //                           width: double.infinity,
-        //                           height: 6.8 * SizeConfig.heightMulti,
-        //                           decoration: BoxDecoration(
-        //                               borderRadius: BorderRadius.circular(10),
-        //                               color: Colors.grey.shade50,
-        //                               border: Border.all(
-        //                                   color: Colors.black26,
-        //                                   width: 2
-        //                               )
-        //                           ),
-        //                           child: Row(
-        //                             mainAxisSize: MainAxisSize.min,
-        //
-        //                             children: [
-        //                               Radio<String>(
-        //                                 value: card.id,
-        //                                 groupValue: paymentMethodeNumberBloc.state.paymentMethodeCreditGroupValue,
-        //                                 onChanged: (value) {
-        //                                   paymentMethodeNumberBloc.changeSelect(value!);
-        //                                 },
-        //                                 activeColor: Colors.green,
-        //                               ),
-        //                               Icon(Icons.payment),
-        //                               SizedBox(width: 10,),
-        //
-        //                               Text(card.cardNumber , style: GoogleFonts.lato(
-        //                                   color: Colors.black54,
-        //                                   fontSize: SizeConfig.titleSize * 2.1,
-        //                                   fontWeight: FontWeight.bold
-        //                               ),),
-        //                               Spacer(),
-        //                               IconButton(onPressed: (){
-        //                                 paymentMethodeNumberBloc.removeOne(state.cards[index]);
-        //                               }, icon: Icon(Icons.delete,color: Colors.red,)),
-        //
-        //                             ],
-        //                           ),
-        //                         ),
-        //                       );
-        //
-        //                     },
-        //
-        //                   ),
-        //                 ),
-        //                 SizedBox(height:25,),
-        //                 Center(
-        //                   child: GestureDetector(
-        //                     onTap: ()async{
-        //                     // await PaymentService().createPaymentMethod();
-        //                       // Navigator.push(context, MaterialPageRoute(builder: (context)=>
-        //                       //     BlocProvider.value(
-        //                       //         value: paymentMethodeNumberBloc,
-        //                       //         child: AddCardScreen())
-        //                       // ));
-        //                       //  paymentMethodeNumberBloc.addOne();
-        //                     },
-        //                     child: Container(
-        //                       margin: EdgeInsets.symmetric(horizontal: 20),
-        //
-        //                       width: SizeConfig.screenWidth ,
-        //                       height: 35,
-        //                       decoration: BoxDecoration(
-        //                           borderRadius: BorderRadius.circular(10),
-        //                           color: Colors.grey.shade50,
-        //                           border: Border.all(
-        //                               color: Colors.black26,
-        //                               width: 2
-        //                           )
-        //                       ),
-        //                       child: Row(
-        //                         mainAxisSize: MainAxisSize.min,
-        //
-        //                         children: [
-        //
-        //                           Icon(Icons.add),
-        //                           SizedBox(width: 10,),
-        //
-        //                           Text(S.of(context)!.addCard, style: GoogleFonts.lato(
-        //                               color: Colors.black54,
-        //                               fontSize: SizeConfig.titleSize * 2.6,
-        //                               fontWeight: FontWeight.bold
-        //                           )
-        //                             ,)
-        //                         ],
-        //                       ),
-        //                     ),
-        //                   ),
-        //                 ),
-        //                 Spacer(),
-        //                 Center(
-        //                   child: BlocConsumer<NewOrderBloc,CreateOrderStates>(
-        //                       bloc: _orderBloc,
-        //                       listener: (context,state)async{
-        //                         if(state is CreateOrderSuccessState)
-        //                         {
-        //                           snackBarSuccessWidget(context, S.of(context)!.orderAddedSuccessfully);
-        //                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> CompleteOrderScreen(orderId: state.data.id)),(route)=>false);
-        //                           shopCartBloc.startedShop();
-        //                         }
-        //                         else if(state is CreateOrderErrorState)
-        //                         {
-        //                           snackBarSuccessWidget(context, S.of(context)!.orderWasNotAdded);
-        //                         }
-        //                       },
-        //                       builder: (context,state) {
-        //                         bool isLoading = state is CreateOrderLoadingState?true:false;
-        //                         return AnimatedContainer(
-        //                           duration: Duration(milliseconds: 200),
-        //                           clipBehavior: Clip.antiAlias,
-        //                           height: 8.44 * SizeConfig.heightMulti,
-        //                           width:isLoading?60: SizeConfig.screenWidth * 0.8,
-        //                           padding: EdgeInsets.all(isLoading?8:0 ),
-        //                           margin: EdgeInsets.symmetric(horizontal: 20),
-        //                           decoration: BoxDecoration(
-        //                               color: ColorsConst.mainColor,
-        //                               borderRadius: BorderRadius.circular(10)
-        //                           ),
-        //                           child:isLoading?Center(child: CircularProgressIndicator(color: Colors.white,)): MaterialButton(
-        //                             onPressed: ()  {
-        //                               cardId =  paymentMethodeNumberBloc.state.paymentMethodeCreditGroupValue;
-        //                               if(cardId ==''){
-        //                                 Fluttertoast.showToast(
-        //                                     msg: S.of(context)!.selectCardAlert,
-        //                                     toastLength: Toast.LENGTH_LONG,
-        //                                     gravity: ToastGravity.TOP,
-        //                                     timeInSecForIosWeb: 1,
-        //                                     backgroundColor: Colors.white,
-        //                                     textColor: Colors.black,
-        //                                     fontSize: 18.0
-        //                                 );
-        //                               }
-        //                               else{
-        //                                 GeoJson geoJson = GeoJson(lat: addressModel.latitude, lon: addressModel.longitude);
-        //                                // _orderBloc.addNewOrder(product: requestProduct, deliveryTimes: deliveryTimesGroupValue, orderType:vipOrder , destination: geoJson,addressName: addressModel.description, phoneNumber: phoneNumber, paymentMethod: paymentGroupValue,numberOfMonth: numberOfMonth, orderValue: orderValue, cardId: cardId,storeId:storeId);
-        //
-        //                               }
-        //
-        //                             },
-        //                             child: Text(S.of(context)!.orderConfirmation, style: TextStyle(color: Colors.white,
-        //                                 fontSize: SizeConfig.titleSize * 2.7),),
-        //
-        //                           ),
-        //                         );
-        //                       }
-        //                   ),
-        //                 ),
-        //                 SizedBox(height: SizeConfig.screenHeight * 0.05,)
-        //               ],
-        //             ),
-        //           );
-        //         }
-        //     ),
-        //   ),
-        // );
-      // }
 
+                                        // GeoJson geoJson = GeoJson(
+                                        //     lat: addressModel.latitude,
+                                        //     lon: addressModel.longitude);
+                                        // _orderBloc.addNewOrder(
+                                        //     product: requestProduct,
+                                        //     deliveryTimes:
+                                        //         deliveryTimesGroupValue,
+                                        //     orderType: vipOrder,
+                                        //     destination: geoJson,
+                                        //     addressName:
+                                        //         addressModel.description,
+                                        //     phoneNumber: phoneNumber,
+                                        //     paymentMethod: paymentGroupValue,
+                                        //     numberOfMonth: numberOfMonth,
+                                        //     orderValue: orderValue,
+                                        //     cardId: cardId,
+                                        // storeId: storeId);
 
-                                          // // GeoJson geoJson = GeoJson(
-                                          // //     lat: addressModel.latitude,
-                                          // //     lon: addressModel.longitude);
-                                          // // _orderBloc.addNewOrder(
-                                          // //     product: requestProduct,
-                                          // //     deliveryTimes:
-                                          // //         deliveryTimesGroupValue,
-                                          // //     orderType: vipOrder,
-                                          // //     destination: geoJson,
-                                          // //     addressName:
-                                          // //         addressModel.description,
-                                          // //     phoneNumber: phoneNumber,
-                                          // //     paymentMethod: paymentGroupValue,
-                                          // //     numberOfMonth: numberOfMonth,
-                                          // //     orderValue: orderValue,
-                                          // //     cardId: cardId,
-                                          // // storeId: storeId);
-
-                                         else {
-                                           print('44444444444444');
-                                           print(addressModel.latitude);
-                                           print(addressModel.longitude);
+                                        else {
+                                          print('44444444444444');
+                                          print(addressModel.latitude);
+                                          print(addressModel.longitude);
                                           GeoJson geoJson = GeoJson(
                                               lat: addressModel.latitude,
                                               lon: addressModel.longitude);
 
-
                                           _orderBloc.addNewOrder(
-                                              product: requestProduct,
-                                              deliveryTimes:
-                                                  deliveryTimesGroupValue,
-                                              orderType: vipOrder,
-                                              destination: geoJson,
-                                              addressName:
-                                              addressModel.description ,
-                                              phoneNumber:
-                                                  _phoneController.text.trim(),
-                                              paymentMethod: paymentGroupValue,
-                                              numberOfMonth: numberOfMonth,
-                                              orderValue: orderValue,
-                                              cardId: cardId,
-                                              storeId: storeId,
-                                              note: _noteController.text.trim(),
-                                              buildingHomeId : _buildingAndHomeNumberController.text.trim(),
+                                            product: requestProduct,
+                                            deliveryTimes:
+                                                deliveryTimesGroupValue,
+                                            orderType: vipOrder,
+                                            destination: geoJson,
+                                            addressName:
+                                                addressModel.description,
+                                            phoneNumber:
+                                                _phoneController.text.trim(),
+                                            paymentMethod: paymentGroupValue,
+                                            numberOfMonth: numberOfMonth,
+                                            orderValue: orderValue,
+                                            cardId: cardId,
+                                            storeId: storeId,
+                                            note: _noteController.text.trim(),
+                                            buildingHomeId:
+                                                _buildingAndHomeNumberController
+                                                    .text
+                                                    .trim(),
                                           );
                                         }
                                       },
                                       child: Text(
-                                        S.of(context)!.orderConfirmation,
+                                        paymentGroupValue ==
+                                                PaymentMethodConst.CREDIT_CARD
+                                            ? S.of(context)!.next
+                                            : S.of(context)!.orderConfirmation,
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w800,
-                                            fontSize:14),
+                                            fontSize: 14),
                                       ),
                                     ),
                             );

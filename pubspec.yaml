@@ -67,6 +67,14 @@ dependencies:
 #  flutter_braintree: ^2.3.1
   #firebase_messaging: ^11.1.0
 
+
+  # Payment
+  flutter_stripe: 4.0.0
+
+
+  # Network Agents
+  http: ^0.13.5
+
   # Streams and State Managment 
   flutter_bloc: ^8.0.1
   rxdart: ^0.26.0
@@ -118,11 +126,11 @@ dependencies:
 
   # Maps
   google_maps_flutter: ^2.1.10
-  geolocator: ^8.2.0
+  geolocator: ^9.0.2
   search_map_location: ^0.0.5
   flutter_google_places: ^0.3.0
   geocoding: ^2.0.4
-  location: ^4.4.0
+  location: ^4.2.0
   distance: ^1.0.0
   # Shimmer
   shimmer: ^2.0.0

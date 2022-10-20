@@ -1,4 +1,5 @@
 
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_kom/consts/utils_const.dart';
 import 'package:my_kom/module_authorization/enums/auth_source.dart';
@@ -14,12 +15,14 @@ import 'package:my_kom/module_authorization/requests/register_request.dart';
 import 'package:my_kom/module_authorization/response/login_response.dart';
 import 'package:my_kom/module_authorization/response/register_response.dart';
 import 'package:my_kom/module_map/models/address_model.dart';
+import 'package:my_kom/module_shoping/service/payment_service.dart';
 import 'package:my_kom/utils/logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
 
 class AuthService {
   final AuthRepository _repository = new AuthRepository();
   final AuthPrefsHelper _prefsHelper = AuthPrefsHelper();
+  final PaymentService _paymentService = PaymentService();
   FirebaseAuth _auth = FirebaseAuth.instance;
    String _verificationCode ='';
   // Delegates
@@ -51,23 +54,29 @@ Future<AppUser>  getCurrentUser()async{
     try {
       String? token = await _repository.register(request.email , request.password);
       /// The result may be an error if a private server is connected
-      print('=========== token after register =============');
-      print(token);
+
       if(token == null)
         return RegisterResponse(data:currentLangIsArabic?'حدث خطأ في عملية التسجيل':'Error in Register', state: false);
+
+
+
+      /// this for register customer in stripe (save and reuse payment method)
+      final customerId =  await _paymentService.setupIntent();
+
 
       /// after verification email
       /// DTO
       ProfileRequest profileRequest = ProfileRequest();
       profileRequest.email = request.email;
-
       profileRequest.userRole = request.userRole;
       profileRequest.address = request.address;
       profileRequest.userName = request.userName;
       profileRequest.phone = request.phone;
+      profileRequest.stripeCustomerId = customerId;
 
       await _repository.createProfile(profileRequest);
-      print('************************************sssss');
+
+
       return RegisterResponse(data: 'Success !', state: true);
 
     } catch (e) {
@@ -208,6 +217,7 @@ Future<AppUser>  getCurrentUser()async{
        await Future.wait([
          _prefsHelper.setUserId(user.uid),
          _prefsHelper.setEmail(user.email!),
+         _prefsHelper.setStripeCustomerId(profileResponse.stripeCustomerId),
          _prefsHelper.setAdderss(profileResponse.address),
          _prefsHelper.setUsername(profileResponse.userName),
          _prefsHelper.setPhone(profileResponse.phone),

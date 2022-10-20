@@ -16,7 +16,16 @@ class AuthPrefsHelper {
     SharedPreferences preferencesHelper = await SharedPreferences.getInstance();
     return preferencesHelper.getString('uid');
   }
+  Future<void> setStripeCustomerId(String userId) async {
+    SharedPreferences preferencesHelper = await SharedPreferences.getInstance();
+    await preferencesHelper.setString('st_customer_id', userId);
+    return;
+  }
 
+  Future<String?> getStripeCustomerId() async {
+    SharedPreferences preferencesHelper = await SharedPreferences.getInstance();
+    return preferencesHelper.getString('st_customer_id');
+  }
   Future<void> setStripId(String userId) async {
     SharedPreferences preferencesHelper = await SharedPreferences.getInstance();
     await preferencesHelper.setString('strip_id', userId);

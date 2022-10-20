@@ -2,6 +2,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_kom/module_company/models/product_model.dart';
 import 'package:my_kom/module_orders/model/order_model.dart';
+import 'package:my_kom/module_orders/response/create_order_response.dart';
 import 'package:my_kom/module_orders/response/orders/orders_response.dart';
 import 'package:my_kom/module_orders/service/orders/orders.service.dart';
 
@@ -46,10 +47,10 @@ class NewOrderBloc extends Bloc<CreateOrderEvent,CreateOrderStates> {
         .addNewOrder(orderSource:null,note:note, storeId: storeId, productsIds: null,customerOrderID: null, products: product, addressName: addressName,deliveryTimes: deliveryTimes, numberOfMonth: numberOfMonth,orderType: orderType, destination: destination, phoneNumber: phoneNumber, paymentMethod: paymentMethod, amount: orderValue, cardId: cardId,
     reorder: false,description: null,arDescription: null,buildingHomeId:buildingHomeId)
         .then((response) {
-          if(response != null){
-            this.add(CreateOrderSuccessEvent(data: response));
-          }else{
-            this.add(CreateOrderErrorEvent(message: 'Error in create order'));
+          if(response.order != null){
+            this.add(CreateOrderSuccessEvent(data: response.order!));
+          }else {
+            this.add(CreateOrderErrorEvent(message: response.message));
           }
       }
     );
@@ -59,10 +60,10 @@ class NewOrderBloc extends Bloc<CreateOrderEvent,CreateOrderStates> {
     _service
         .reorder(orderID)
         .then((response) {
-      if(response!= null){
-        this.add(CreateOrderSuccessEvent(data:response ));
+      if(response.order == null){
+        this.add(CreateOrderSuccessEvent(data:response.order! ));
       }else{
-        this.add(CreateOrderErrorEvent(message: 'Error in create order'));
+        this.add(CreateOrderErrorEvent(message: response.message));
       }
     }
     );

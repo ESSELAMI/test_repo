@@ -1,14 +1,14 @@
-class updateOrderRequest {
+class UpdateOrderRequest {
   late String orderID;
-  late String state;
+  late bool paymentState;
  // late String duration;
 
-  updateOrderRequest({required this.orderID,required this.state});
+  UpdateOrderRequest({required this.orderID});
 
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> paymentStateToJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-   data['status'] = this.state;
+    data['payment_state'] = this.paymentState;
     return data;
   }
 }

@@ -21,12 +21,14 @@ class LoginResponse{
 class ProfileResponse{
   late String email;
   late String userName;
+  late String stripeCustomerId;
   late String phone;
  late UserRole userRole;
  late AddressModel address;
   
   ProfileResponse.fromJson(Map<String , dynamic> map){
     this.userName = map['userName'];
+    this.stripeCustomerId = map['stripeCustomerId'] == null ? '': map['stripeCustomerId'] ;
     this.phone = map['phone'];
     this.email = map['email'];
      this.userRole = (map['userRole'] == '${UserRole.ROLE_USER.name}')? UserRole.ROLE_USER:UserRole.ROLE_OWNER ;

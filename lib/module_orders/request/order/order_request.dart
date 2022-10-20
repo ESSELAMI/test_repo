@@ -1,5 +1,6 @@
 
 import 'package:my_kom/consts/order_status.dart';
+import 'package:my_kom/consts/payment_method.dart';
 import 'package:my_kom/module_company/models/product_model.dart';
 import 'package:my_kom/module_orders/response/orders/orders_response.dart';
 
@@ -18,6 +19,7 @@ class CreateOrderRequest {
   late String description;
   late String ar_description;
   late String payment;
+  late bool? paymentState;
   late String status;
   late String? cardId;
   late int customerOrderID ;
@@ -33,6 +35,7 @@ class CreateOrderRequest {
      required this.destination,
      required this.phone,
      required this.payment,
+     required this.paymentState,
      required this.products,
      required this.numberOfMonth,
      required this.deliveryTime,
@@ -67,6 +70,9 @@ class CreateOrderRequest {
      data['store_Id'] = this.storeId;
     data['status'] = this.status;
     data['payment'] = this.payment;
+    if(payment == PaymentMethodConst.CREDIT_CARD){
+      data['payment_state'] = this.paymentState;
+    }
     data['description'] = this.description;
     data['ar_description'] = this.ar_description;
     data['order_value'] = this.orderValue;
@@ -98,6 +104,9 @@ class CreateOrderRequest {
     data['destination'] = this.destination.toJson();
     data['order_value'] = this.orderValue;
     data['payment'] = this.payment;
+    if(payment == PaymentMethodConst.CREDIT_CARD){
+      data['payment_state'] = this.paymentState;
+    }
     data['address_name'] = this.addressName;
     data['description'] = this.description;
     data['ar_description'] = this.ar_description;

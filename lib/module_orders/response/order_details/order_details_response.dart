@@ -1,5 +1,6 @@
 
 import 'package:my_kom/consts/order_status.dart';
+import 'package:my_kom/consts/payment_method.dart';
 import 'package:my_kom/module_company/models/product_model.dart';
 import 'package:my_kom/module_orders/response/orders/orders_response.dart';
 
@@ -19,6 +20,7 @@ class OrderDetailResponse {
   late String buildingHomeId;
   late String ar_description;
   late String payment;
+  late bool? paymentState;
   late String? cardId;
   late OrderStatus status;
   late int customerOrderID;
@@ -41,6 +43,7 @@ class OrderDetailResponse {
     this.numberOfMonth = json['number_of_month'];
     this.orderValue = json['order_value'];
     this.payment = json['payment'];
+    this.paymentState  = json['payment_state'];
     this.phone = json['phone'];
     this.buildingHomeId = json['building_home_id'];
     this.customerOrderID = json['customer_order_id'];

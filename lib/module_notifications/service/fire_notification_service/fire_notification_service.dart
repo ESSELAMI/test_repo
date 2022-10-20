@@ -14,9 +14,6 @@ class FireNotificationService {
   final NotificationsPrefsHelper _prefsHelper = NotificationsPrefsHelper();
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  final ProfileService _profileService = ProfileService();
-
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static final PublishSubject<String> _onNotificationRecieved =
       PublishSubject();
@@ -67,6 +64,7 @@ class FireNotificationService {
         showSimpleNotification(Text( message.title!)
         ,subtitle: Text(message.body!),
           duration: Duration(seconds: 2),
+
 
         );
       }

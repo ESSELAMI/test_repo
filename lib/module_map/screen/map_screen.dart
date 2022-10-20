@@ -133,16 +133,23 @@ class _MapScreenState extends State<MapScreen> {
             print(addressModel.longitude);
           }
 
-          ///for map error
-          Navigator.of(context).push(MaterialPageRoute(builder: (_) => Center(child: Container(
-            height: 30,
-            width: 30,
-            child: (Platform.isIOS)?CupertinoActivityIndicator():CircularProgressIndicator(color: ColorsConst.mainColor,),
-          ),)));
-          await Future.delayed(Duration(seconds: 1));
+          if(Platform.isIOS){
+            Navigator.of(context).pop(addressModel);
+          }
+          else{
+            ///for map error in Android
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => Center(child: Container(
+              height: 30,
+              width: 30,
+              child: (Platform.isIOS)?CupertinoActivityIndicator():CircularProgressIndicator(color: ColorsConst.mainColor,),
+            ),)));
+            await Future.delayed(Duration(seconds: 1));
+            /// fetch data from map
+            Navigator.of(context)..pop()..pop(addressModel);
+          }
 
-          /// fetch data from map
-          Navigator.of(context)..pop()..pop(addressModel);
+
+
           _mapBloc.close();
         } else if (state is MapGestureSuccessState) {
           location_from_search = null;

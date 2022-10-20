@@ -2,6 +2,7 @@
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:my_kom/consts/order_status.dart';
+import 'package:my_kom/consts/payment_method.dart';
 import 'package:my_kom/module_company/models/product_model.dart';
 import 'package:my_kom/module_orders/response/orders/orders_response.dart';
 
@@ -22,6 +23,7 @@ class OrderModel {
  late String description;
  late String ar_description;
  late String payment;
+ late bool? paymentState ;
  late OrderStatus status;
  late String? cardId;
  late bool vipOrder;
@@ -56,6 +58,7 @@ class OrderModel {
    this.ar_description = json['ar_description']==null? json['description'] :  json['ar_description'];
    this.orderValue = json['order_value'];
    this.payment = json['payment'];
+   this.paymentState = json['payment_state'];
    this.customerOrderID =json['customer_order_id'];
    this.vipOrder =json['vip_order'];
    this.orderSource =json['order_source'];

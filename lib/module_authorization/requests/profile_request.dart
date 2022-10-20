@@ -7,6 +7,7 @@ class ProfileRequest {
   late final UserRole userRole;
   late final String userName;
   late final AddressModel address;
+  late final String stripeCustomerId;
   late final String phone;
   ProfileRequest();
 
@@ -14,7 +15,7 @@ class ProfileRequest {
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {};
     map['email'] = this.email;
-    //map['password'] = this.password ;
+    map['stripeCustomerId'] = this.stripeCustomerId ;
     map['userRole'] = this.userRole.name;
     map['userName'] = this.userName;
     map['phone'] = this.phone;
