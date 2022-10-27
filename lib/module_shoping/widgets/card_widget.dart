@@ -7,8 +7,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:my_kom/consts/colors.dart';
 import 'package:my_kom/module_authorization/presistance/auth_prefs_helper.dart';
-import 'package:my_kom/module_shoping/bloc/payment_bloc.dart';
-import 'package:my_kom/module_shoping/bloc/payment_methodes_bloc.dart';
+import 'package:my_kom/module_payment/bloc/payment_bloc.dart';
+import 'package:my_kom/module_payment/bloc/payment_methodes_bloc.dart';
 import 'package:my_kom/module_shoping/models/card_model.dart';
 import 'package:my_kom/utils/size_configration/size_config.dart';
 

@@ -10,6 +10,9 @@ class ShopCartBloc extends Bloc<CartEvents,CartState> {
   ShopCartBloc() : super(CartLoading()){
 
     on<CartEvents>((CartEvents event, Emitter<CartState> emit){
+      print('++++++++++++++++++++++++++++++++++++++++++');
+      print(event);
+      print('++++++++++++++++++++++++++++++++++++++++++');
       if(event is CartStartedEvent){
         emit(CartLoaded(cart: Cart(products: [],minimum_pursh: mimimum_purch)));
       }
@@ -26,13 +29,28 @@ class ShopCartBloc extends Bloc<CartEvents,CartState> {
           ));
         }
       }
+      else if(event is CartRemovedFullQuantityEvent){
+
+        if(state is CartLoaded){
+          List<ProductModel> _list = [];
+          (state as CartLoaded ).cart.products.forEach((element) {
+            if(element.id != event.productModel.id)
+              _list.add(element);
+          });
+          emit(CartLoaded(cart: Cart( products:_list,minimum_pursh: mimimum_purch)
+          ));
+        }
+      }
 
 
       else if(event is CartAddListEvent){
+
         if(state is CartLoaded){
           emit(CartLoaded(cart: Cart( products:List.from( (state as CartLoaded ).cart.products)..addAll(event.products),minimum_pursh: mimimum_purch)
           ));
-        }}
+        }
+
+      }
 
 
       });
@@ -55,13 +73,17 @@ class ShopCartBloc extends Bloc<CartEvents,CartState> {
    this.add(CartRemovedEvent(productModel));
  }
 
+  Future<void> removeFullQuantityProductFromCart(ProductModel productModel) async{
+    this.add(CartRemovedFullQuantityEvent(productModel));
+  }
+
+
  Future addProductsToCart(ProductModel productModel, int quantity) async{
    List<ProductModel> products =[];
-
-   for(int i=0;i<quantity;i++){
-     products.add(productModel);
-   }
-  this.add(CartAddListEvent(products));
+     for(int i=0;i<quantity;i++){
+       products.add(productModel);
+     }
+     this.add(CartAddListEvent(products));
    return ;
   }
   
@@ -109,9 +131,16 @@ class CartAddedEvent  extends CartEvents{
   @override
   List<Object?> get props => [];
 }
+
 class CartRemovedEvent extends CartEvents{
   ProductModel productModel;
   CartRemovedEvent(this.productModel);
+  @override
+  List<Object?> get props => [];
+}
+class CartRemovedFullQuantityEvent extends CartEvents{
+  ProductModel productModel;
+  CartRemovedFullQuantityEvent(this.productModel);
   @override
   List<Object?> get props => [];
 }

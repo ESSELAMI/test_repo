@@ -1,13 +1,13 @@
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_kom/module_authorization/requests/profile_request.dart';
-import 'package:my_kom/module_authorization/requests/register_request.dart';
 import 'package:my_kom/module_profile/model/profile_model.dart';
 import 'package:my_kom/module_profile/service/profile_service.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileStates> {
   final ProfileService _service = ProfileService();
 
-  ProfileBloc() : super(ProfileInitState()) {
+  ProfileBloc() : super(ProfileInitState(true)) {
     on<ProfileEvent>((ProfileEvent event, Emitter<ProfileStates> emit) {
       if (event is ProfileLoadingEvent)
               emit(ProfileLoadingState());
@@ -16,8 +16,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileStates> {
             }
             else if (event is ProfileSuccessEvent)
             emit(ProfileSuccessState(data: event.data , isEditState: event.isEditState));
-      else {
-        emit(ProfileInitState());
+      else if (event is ProfileInitEvent){
+        emit(ProfileInitState(event.data));
       }
     });
   }
@@ -27,15 +27,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileStates> {
   getMyProfile() async {
     this.add(ProfileLoadingEvent());
     _service.getMyProfile().then((value) {
-      if (value !=null) {
-        this.add(ProfileSuccessEvent(data: value,isEditState: false));
-      } else
-        this.add(ProfileErrorEvent(data: 'Error getting Profile Fire Base API'));
-    });
-  }
-  getUserProfile({required String userId}) async {
-    this.add(ProfileLoadingEvent());
-    _service.getUserProfile(userId).then((value) {
       if (value !=null) {
         this.add(ProfileSuccessEvent(data: value,isEditState: false));
       } else
@@ -52,12 +43,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileStates> {
          this.add(ProfileErrorEvent(data: 'Error getting Profile Fire Base API'));
      });
  }
-
-
-  void deleteFakeAccount() {
-  //  _service.fakeAccount();
-
+  Future<bool> checkInfoCompete()async {
+    return await _service.checkIfCompleteInformation();
   }
+
 
   Future<bool> deleteMyAccount()async {
    return await _service.deleteMyAccount();
@@ -69,7 +58,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileStates> {
 abstract class ProfileEvent {}
 
 class ProfileInitEvent extends ProfileEvent {
-    String data;
+    bool data;
   ProfileInitEvent({required this.data});
 }
 
@@ -90,7 +79,10 @@ class ProfileErrorEvent extends ProfileEvent {
 
 abstract class ProfileStates {}
 
-class ProfileInitState extends ProfileStates {}
+class ProfileInitState extends ProfileStates {
+  bool profileInfoIsCompleted;
+  ProfileInitState(this.profileInfoIsCompleted);
+}
 
 class ProfileSuccessState extends ProfileStates {
     ProfileModel data;

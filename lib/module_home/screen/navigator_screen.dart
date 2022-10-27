@@ -1,12 +1,17 @@
 
 import 'dart:io';
 
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_kom/consts/colors.dart';
+import 'package:my_kom/module_authorization/enums/auth_source.dart';
+import 'package:my_kom/module_authorization/presistance/auth_prefs_helper.dart';
 import 'package:my_kom/module_home/screen/home_screen.dart';
 import 'package:my_kom/module_home/screen/setting_screen.dart';
 import 'package:my_kom/module_orders/ui/screens/captain_orders/captain_orders.dart';
 import 'package:my_kom/module_profile/screen/profile_screen.dart';
+import 'package:my_kom/module_shoping/bloc/shopping_cart_bloc.dart';
 import 'package:my_kom/module_shoping/screen/shop_screen.dart';
 import 'package:my_kom/generated/l10n.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
@@ -38,6 +43,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   }
   @override
   Widget build(BuildContext context) {
+
     return SafeArea(
       bottom: true, /// For IOS
       child: Scaffold(
@@ -49,6 +55,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
             child: ConvexAppBar(
               style: TabStyle.fixedCircle,
               curve:Curves.easeInOut ,
+
               /// For Android
               ///cornerRadius: 8.0,
 
@@ -59,23 +66,71 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
               height: 56.0,
               items: [
                 TabItem(
-
-                  isIconBlend: true,
+                isIconBlend: true,
                 activeIcon: Icon(Icons.description),
                 icon: Icons.description_outlined, title: S.of(context)!.orders,
-
                 ),
                 TabItem(
                     isIconBlend: true,
                     activeIcon: Icon(Icons.person),
-                    icon:Icons.perm_identity, title: S.of(context)!.profile),
+                    icon:FutureBuilder<bool>(
+                        future: widget.profileScreen.profileBloc.checkInfoCompete(),
+                        builder: (context,state) {
+                          print(state.data);
+                          bool check =false;
+                          if(state.hasData)
+                          {
+                           check = state.data!;
+                          return Container(
+
+                              child:  !check? Badge(
+                                // position: BadgePosition.topEnd(top: 0, end: 3),
+                                  animationDuration: Duration(milliseconds: 300),
+                                  animationType: BadgeAnimationType.slide,
+
+                                  child: Icon(Icons.perm_identity)
+                              ):Container(
+                                  child: Icon(Icons.perm_identity)
+                              )
+                          );}else{
+                            return Container(
+                                child: Icon(Icons.perm_identity)
+                            );
+                          }
+                        }
+                    )
+
+                    , title: S.of(context)!.profile),
+
                 TabItem(icon:current_index == 2? Icons.home: Icons.home_outlined, title: S.of(context)!.home,
 
                 ),
                 TabItem(
                     isIconBlend: true,
+                    title: S.of(context)!.ship,
                     activeIcon: Icon(Icons.shopping_cart),
-                    icon: Icons.shopping_cart_outlined, title: S.of(context)!.ship),
+                    icon: BlocBuilder<ShopCartBloc,CartState>(
+                      bloc: shopCartBloc,
+                      builder: (context,state) {
+                        bool len =false;
+                        if(state is CartLoaded)
+                          {
+                           len = state.cart.products.length>0;
+                          }
+                        return Container(
+
+                          child:  len? Badge(
+                            // position: BadgePosition.topEnd(top: 0, end: 3),
+                            animationDuration: Duration(milliseconds: 300),
+                            animationType: BadgeAnimationType.slide,
+                            child: Icon(Icons.shopping_cart_outlined)
+                          ):Container(
+                              child: Icon(Icons.shopping_cart_outlined)
+                          )
+                        );
+                      }
+                    ),
+                ),
                 TabItem(
                     isIconBlend: true,
                     activeIcon: Icon(Icons.widgets),
@@ -145,6 +200,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
 
       ),
     );
+
   }
  Color _getNavItemColor(){
    if(current_index ==0)

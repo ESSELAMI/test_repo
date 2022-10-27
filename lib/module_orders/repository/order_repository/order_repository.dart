@@ -1,6 +1,7 @@
 
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_kom/module_orders/exceptions/order_exceptions.dart';
 import 'package:my_kom/module_orders/request/accept_order_request/accept_order_request.dart';
 import 'package:my_kom/module_orders/request/order/order_request.dart';
 import 'package:my_kom/module_orders/response/order_details/order_details_response.dart';
@@ -144,11 +145,7 @@ class OrderRepository {
   }
   
  Future<bool> deleteOrder(String orderId)async {
-
-    print('delete order by order id: ${orderId}');
-
     try{
-
       /// Get a new write batch
       final batch = _firestore.batch();
 
@@ -159,16 +156,20 @@ class OrderRepository {
       /// remove More Detail
       var moreOrderRef = _firestore.collection('orders').doc(mainOrderRef.id).collection('details').doc();
       batch.delete(moreOrderRef);
-
       /// Commit the batch
+
      await batch.commit().then((_) {
         print('Data Success Commit !!!!!!');
       }).catchError((e){
+        print('43434343433333333333');
+        print(e.toString());
         throw Exception();
       });
 
       return true;
     }catch(e){
+
+      print(e.toString());
       print('tag : repository , message : Error in deleted !!! ');
       return false;
     }
@@ -176,8 +177,6 @@ class OrderRepository {
 
   Future<void> updateOrder(UpdateOrderRequest request) async{
     try{
-      print('order id');
-      print(request.orderID);
       var doc = await _firestore.collection('orders').doc(request.orderID).update(request.paymentStateToJson());
       //DocumentReference _ref =  doc.reference;
 
@@ -228,19 +227,22 @@ class OrderRepository {
  }
 
 
+  /// Fetch the current state of the products
+  Future<Map<String , dynamic>> getCurrentStateOfProductById(String productId)async{
+    var _ref =  await _firestore.collection('products').doc(productId).get();
+
+    // product not found (deleted)
+    if(!_ref.exists){
+      throw OrderException('Product Not Found');
+    }
+    // product is exist
+    else{
+      Map<String , dynamic> res = _ref.data() as Map<String , dynamic>;
+      res['id'] = _ref.id;
+      return res;
+    }
 
 
-  // Future<OrderDetailsResponse?> updateOrder(UpdateOrderRequest request) async {
-  //   // var token = await _authService.getToken();
-  //   // dynamic response = await _apiClient.put(
-  //   //   '${Urls.CAPTAIN_ORDER_UPDATE_API}',
-  //   //   request.toJson(),
-  //   //   headers: {'Authorization': 'Bearer ' + token},
-  //   // );
-  //
-  //   // if (response == null) return null;
-  //
-  //   // return OrderDetailsResponse.fromJson(response);
-  //   return null;
-  // }
+  }
+
 }

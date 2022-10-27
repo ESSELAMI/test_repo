@@ -16,6 +16,7 @@ import 'package:my_kom/module_company/company_routes.dart';
 import 'package:my_kom/module_company/models/product_model.dart';
 import 'package:my_kom/module_orders/model/order_model.dart';
 import 'package:my_kom/module_orders/state_manager/order_detail_bloc.dart';
+import 'package:my_kom/module_orders/ui/widgets/cancel_order_widget.dart';
 import 'package:my_kom/utils/size_configration/size_config.dart';
 import 'package:my_kom/generated/l10n.dart';
 
@@ -28,16 +29,22 @@ class OrderDetailScreen extends StatefulWidget {
 }
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
-  final OrderDetailBloc _detailBloc = OrderDetailBloc();
+  late final OrderDetailBloc _detailBloc;
   late String orderID;
 @override
   void initState() {
+  _detailBloc = OrderDetailBloc();
   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
     orderID = ModalRoute.of(context)!.settings.arguments.toString();
     _detailBloc.getOrderDetail(orderId:orderID);
   });
 
     super.initState();
+  }
+  @override
+  void dispose() {
+    _detailBloc.close();
+    super.dispose();
   }
   @override
   Widget build(BuildContext context) {
@@ -443,6 +450,31 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ),
 
 
+                    SizedBox(height: 30,),
+                    Center(
+                      child: Container(
+                        height: 35.0,
+                        margin: EdgeInsets.symmetric(horizontal: 10),
+                        width: 300.0,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 2))
+                            ]),
+                        child: MaterialButton(
+                          onPressed: (){
+                            cancelOrderAlertWidget(context,_detailBloc,orderID);
+                          },
+                          child: Center(
+                            child: Text('Cancel Order' , style: TextStyle(color: Colors.red,fontSize:18,fontWeight: FontWeight.bold),),
+                          ),
+                        ),
+                      ),
+                    ),
                     SizedBox(height: 20,),
                   ],
                 ),

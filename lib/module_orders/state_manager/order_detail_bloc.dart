@@ -35,6 +35,31 @@ class OrderDetailBloc extends Bloc<OrderDetailEvent,OrderDetailStates> {
       }
     );
   }
+
+  void getDetailForReorder({required String orderId}) {
+    this.add(OrderDetailLoadingEvent());
+    _service
+        .getDetailsForReorder(orderId)
+        .then((response) {
+      if(response != null){
+        this.add(OrderDetailSuccessEvent(data: response));
+      }else{
+        this.add(OrderDetailErrorEvent(message: 'Error in get order detail !!'));
+      }
+    }
+    );
+  }
+
+  @override
+  Future<void> close() {
+    _service.closePendingStream();
+    _service.closeFinishedStream();
+    return super.close();
+  }
+
+  Future<bool> deleteOrder(String orderId)async{
+    return await _service.deleteOrder(orderId);
+  }
 }
 
 

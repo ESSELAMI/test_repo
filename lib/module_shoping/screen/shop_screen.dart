@@ -30,13 +30,14 @@ import 'package:my_kom/module_orders/response/orders/orders_response.dart';
 import 'package:my_kom/module_orders/service/orders/orders.service.dart';
 import 'package:my_kom/module_orders/state_manager/new_order/new_order.state_manager.dart';
 import 'package:my_kom/module_orders/ui/screens/complete_order_screen.dart';
+import 'package:my_kom/module_payment/bloc/payment_methodes_bloc.dart';
 import 'package:my_kom/module_persistence/sharedpref/shared_preferences_helper.dart';
 import 'package:my_kom/module_profile/model/quick_location_model.dart';
 import 'package:my_kom/module_shoping/bloc/check_address_bloc.dart';
 import 'package:my_kom/module_shoping/bloc/my_addresses_bloc.dart';
-import 'package:my_kom/module_shoping/bloc/payment_methodes_bloc.dart';
 import 'package:my_kom/module_shoping/bloc/shopping_cart_bloc.dart';
 import 'package:my_kom/module_shoping/models/card_model.dart';
+import 'package:my_kom/module_shoping/models/cart_arrguments.dart';
 import 'package:my_kom/module_shoping/preferences/card_icons.dart';
 import 'package:my_kom/module_shoping/widgets/card_widget.dart';
 
@@ -105,14 +106,40 @@ class _ShopScreenState extends State<ShopScreen> {
 
   @override
   void initState() {
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if((ModalRoute.of(context)!.settings.arguments)!= null){
+        CartArguments cartArguments =  (ModalRoute.of(context)!.settings.arguments) as CartArguments;
+        addressModel = cartArguments.addressModel;
+        _newAddressController.text = addressModel.description;
+        _buildingAndHomeNumberController.text = cartArguments.buildingId;
+        _phoneController.text = cartArguments.phone;
+        vipOrder = cartArguments.vip;
+        _noteController.text = cartArguments.note;
+        setState((){});
+
+      }else{
+
+        _authPrefsHelper.getAddress().then((value) {
+          if (value != null) {
+            addressModel = value;
+            _newAddressController.text = value.description;
+          }
+        });
+
+
+        _authPrefsHelper.getPhone().then((value) {
+          _phoneController.text = value!;
+        });
+
+      }
+
+
+
+    });
     _newAddressController = TextEditingController(text: '');
     isLogginCubit = IsLogginCubit();
-    _authPrefsHelper.getAddress().then((value) {
-      if (value != null) {
-        addressModel = value;
-        _newAddressController.text = value.description;
-      }
-    });
+
     _preferencesHelper.getCurrentStore().then((store) {
       if (store != null) {
         storeId = store;
@@ -123,10 +150,6 @@ class _ShopScreenState extends State<ShopScreen> {
           }
         });
       } else {}
-    });
-
-    _authPrefsHelper.getPhone().then((value) {
-      _phoneController.text = value!;
     });
 
     ///To get the source of the request (sub area)
@@ -192,8 +215,9 @@ class _ShopScreenState extends State<ShopScreen> {
   /// For Validation (The order completable or not)
   bool orderNotComplete = false;
 
-  /// Snack Messages
-  GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+  /// Keys
+  final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+  final productListShopKey = GlobalKey<AnimatedListState>();
   final GlobalKey<FormState> _destinationFormKey = GlobalKey<FormState>();
 
   _getSubAreaForAddress(LatLng? latLng) {
@@ -261,21 +285,34 @@ class _ShopScreenState extends State<ShopScreen> {
                   backgroundColor: Colors.white,
                   appBar: AppBar(
                     backgroundColor: Colors.white,
-                    leading: IconButton(
-                      icon: Icon(
-                        Platform.isIOS
-                            ? Icons.arrow_back_ios
-                            : Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                      onPressed: () {
-                        if (Navigator.canPop(context)) Navigator.pop(context);
-                      },
-                    ),
+                    leading: (Navigator.canPop(context))
+                        ? IconButton(
+                            icon: Icon(
+                              Platform.isIOS
+                                  ? Icons.arrow_back_ios
+                                  : Icons.arrow_back,
+                              color: Colors.black,
+                            ),
+                            onPressed: () {
+                              if (Navigator.canPop(context)){
+                                if( currentIndex == 0){
+                                  Navigator.pop(context);
+                                }else{
+                                  currentIndex -- ;
+                                  _pageController.animateToPage(
+                                    currentIndex,
+                                    duration: const Duration(milliseconds: 100),
+                                    curve: Curves.easeInOut,
+                                  );
+                                }
+                              }
+                            },
+                          )
+                        : SizedBox.shrink(),
                     elevation: 0,
                     title: Text(S.of(context)!.shoppingCart,
                         style: GoogleFonts.lato(
-                            fontSize: 20,
+                            fontSize: 20.0,
                             fontWeight: FontWeight.bold,
                             color: Colors.black54)),
                   ),
@@ -297,8 +334,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                   duration: Duration(seconds: 1),
                                   builder: (context, double value, child) {
                                     return Container(
-                                        width: 72,
-                                        height: 72,
+                                        width: 72.0,
+                                        height: 72.0,
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 10),
                                         child: Stack(
@@ -320,8 +357,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                                     ]).createShader(rect);
                                               },
                                               child: Container(
-                                                width: 80,
-                                                height: 80,
+                                                width: 80.0,
+                                                height: 80.0,
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     color: Colors.white),
@@ -329,8 +366,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                             ),
                                             Center(
                                               child: Container(
-                                                height: 45,
-                                                width: 45,
+                                                height: 45.0,
+                                                width: 45.0,
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     color: Colors.white),
@@ -350,7 +387,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                         ));
                                   }),
                               SizedBox(
-                                width: 10,
+                                width: 10.0,
                               ),
                               Expanded(
                                 child: Column(
@@ -363,13 +400,13 @@ class _ShopScreenState extends State<ShopScreen> {
                                             fontWeight: FontWeight.w600,
                                             fontSize: 14)),
                                     SizedBox(
-                                      height: 6,
+                                      height: 6.0,
                                     ),
                                     Text('  ' + nextTitle[currentIndex],
                                         style: TextStyle(
                                             color: Colors.black54,
                                             fontWeight: FontWeight.w500,
-                                            fontSize: 11))
+                                            fontSize: 11.0))
                                   ],
                                 ),
                               ),
@@ -377,7 +414,7 @@ class _ShopScreenState extends State<ShopScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: 10,
+                          height: 10.0,
                         ),
                         Expanded(
                           child: PageView(
@@ -409,176 +446,273 @@ class _ShopScreenState extends State<ShopScreen> {
         });
   }
 
+
+  void _removeProductFromUi(int index,ProductModel removedProduct){
+    productListShopKey.currentState!.removeItem(index, (context, animation) =>
+        _buildShoppingCard(productModel: removedProduct, quantity: removedProduct.orderQuantity == null?0:removedProduct.orderQuantity!, animation: animation,index: index),
+    duration: Duration(milliseconds: 300)
+    );
+  }
+
   Widget _buildShoppingCard(
-      {required ProductModel productModel, required int quantity}) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      height: 95,
-      width: double.infinity,
-      child: Row(
+      {required ProductModel productModel, required int quantity,required Animation<double> animation,required int index}) {
+
+    bool _isExist = productModel.isExist;
+
+    return SlideTransition(
+      key: ValueKey(productModel.imageUrl),
+      position: Tween<Offset>(begin: Offset(-1,0),end: Offset.zero).animate(CurvedAnimation(parent: animation, curve: Curves.linear)),
+      child: Stack(
         children: [
           Container(
-            width: 10,
-            decoration: BoxDecoration(
-                color: ColorsConst.mainColor,
-                borderRadius: UtilsConst.lang == 'en'
-                    ? BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomLeft: Radius.circular(20),
-                      )
-                    : BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
-                      )),
-          ),
-          Expanded(
-            child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 2,
-                        offset: Offset(0, 2))
-                  ],
+            margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            height: 95.0,
+            width: double.infinity,
+            child: Row(
+              children: [
+                Container(
+                  width: 10.0,
+                  decoration: BoxDecoration(
+                      color: _isExist?ColorsConst.mainColor:Colors.red,
+                      borderRadius: UtilsConst.lang == 'en'
+                          ? BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              bottomLeft: Radius.circular(20),
+                            )
+                          : BorderRadius.only(
+                              topRight: Radius.circular(20),
+                              bottomRight: Radius.circular(20),
+                            )),
                 ),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    double h = constraints.maxHeight;
-                    double w = constraints.maxWidth;
+                Expanded(
+                  child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
 
-                    return Row(
-                      children: [
-                        Container(
-                          width: w / 4,
-                          //   child: Image.network(productModel.imageUrl,fit: BoxFit.contain,),
-                          child: CachedNetworkImage(
-                            imageUrl: productModel.imageUrl,
-                            progressIndicatorBuilder: (context, l, ll) =>
-                                Center(
-                              child: Container(
-                                height: 30,
-                                width: 30,
-                                child: CircularProgressIndicator(
-                                  value: ll.progress,
-                                  color: Colors.black12,
-                                ),
+                        boxShadow: [
+                          _isExist?
+                          BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 2.0,
+                              offset: Offset(0, 2)):
+                          BoxShadow(
+                              color: Colors.red,
+                              blurRadius: 1.0,
+                              offset: Offset(0, 1))
+
+                        ],
+                      ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          double h = constraints.maxHeight;
+                          double w = constraints.maxWidth;
+
+                          return Row(
+                            children: [
+                              Container(
+                                width: w / 4,
+                                //   child: Image.network(productModel.imageUrl,fit: BoxFit.contain,),
+                                child: CachedNetworkImage(
+                                  imageUrl: productModel.imageUrl,
+                                  progressIndicatorBuilder: (context, l, ll) =>
+                                   Center(
+                                    child: Container(
+                                      height: 30.0,
+                                      width: 30.0,
+                                      child: CircularProgressIndicator(
+                                        value: ll.progress,
+                                        color: Colors.black12,
+                                      ),
+                                    ),
+                                  ),
+                                  errorWidget: (context, s, l) =>
+                                      Icon(Icons.error),
+                                  fit: BoxFit.fill,
+                                ), // Image.asset(productModel.imageUrl),
                               ),
-                            ),
-                            errorWidget: (context, s, l) => Icon(Icons.error),
-                            fit: BoxFit.fill,
-                          ), // Image.asset(productModel.imageUrl),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          width: w / 2.3,
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  UtilsConst.lang == 'en'
-                                      ? productModel.title
-                                      : productModel.title2,
-                                  style: TextStyle(
-                                      fontSize: 13.4,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                SizedBox(
-                                  height: 4,
-                                ),
-                                Text(
-                                    '${productModel.quantity}' +
-                                                ' ' +
-                                                UtilsConst.lang ==
-                                            'en'
-                                        ? 'pcs'
-                                        : 'حبة',
-                                    style: TextStyle(
-                                        fontSize: 13.0,
-                                        color: Colors.black54,
-                                        fontWeight: FontWeight.w600)),
-                                SizedBox(
-                                  height: 4,
-                                ),
-                                Text(
-                                  '${productModel.price}' +
-                                      '  ${UtilsConst.lang == 'en' ? 'AED' : 'د.إ'}',
-                                  style: TextStyle(
-                                      color: ColorsConst.mainColor,
-                                      fontSize: 14),
-                                )
-                              ]),
-                        ),
-                        Spacer(),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              height: h / 3,
-                              width: w / 4,
-                              clipBehavior: Clip.antiAlias,
-                              decoration: BoxDecoration(
-                                boxShadow: [BoxShadow(color: Colors.black12)],
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.white.withOpacity(0.1),
+                              SizedBox(
+                                width: 10.0,
                               ),
-                              child: Stack(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                              Container(
+                                width: w / 2.3,
+                                child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Container(
-                                        color: ColorsConst.mainColor,
-                                        width: SizeConfig.widhtMulti * 8,
-                                        child: IconButton(
-                                            onPressed: () {
-                                              shopCartBloc
-                                                  .removeProductFromCart(
-                                                      productModel);
-                                            },
-                                            icon: Icon(
-                                              Icons.remove,
-                                              size: 19,
-                                              color: Colors.white,
-                                            )),
+                                      Text(
+                                        UtilsConst.lang == 'en'
+                                            ? productModel.title
+                                            : productModel.title2,
+                                        style: TextStyle(
+                                            fontSize: 13.4,
+                                            fontWeight: FontWeight.w600),
                                       ),
-                                      Container(
-                                        child: Text(quantity.toString()),
+                                      SizedBox(
+                                        height: 4.0,
                                       ),
-                                      Container(
-                                        width: SizeConfig.widhtMulti * 8,
-                                        alignment: Alignment.center,
-                                        color: ColorsConst.mainColor,
-                                        child: Center(
-                                          child: IconButton(
-                                              onPressed: () {
-                                                shopCartBloc.addProductToCart(
-                                                    productModel);
-                                              },
-                                              icon: Icon(
-                                                Icons.add,
-                                                size: 19,
-                                                color: Colors.white,
-                                              )),
+                                      Text(
+                                          '${productModel.quantity}' +
+                                                      ' ' +
+                                                      UtilsConst.lang ==
+                                                  'en'
+                                              ? 'pcs'
+                                              : 'حبة',
+                                          style: TextStyle(
+                                              fontSize: 13.0,
+                                              color: Colors.black54,
+                                              fontWeight: FontWeight.w600)),
+                                      SizedBox(
+                                        height: 4.0,
+                                      ),
+                                      Text(
+                                        '${productModel.price}' +
+                                            '  ${UtilsConst.lang == 'en' ? 'AED' : 'د.إ'}',
+                                        style: TextStyle(
+                                            color: ColorsConst.mainColor,
+                                            fontSize: 14.0),
+                                      )
+                                    ]),
+                              ),
+                              Spacer(),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    height: h / 3,
+                                    width: w / 4,
+                                    clipBehavior: Clip.antiAlias,
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(color: Colors.black12)
+                                      ],
+                                      borderRadius: BorderRadius.circular(5.0),
+                                      color: Colors.white.withOpacity(0.1),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              color:_isExist? ColorsConst.mainColor:Colors.black45,
+                                              width: SizeConfig.widhtMulti * 8.0,
+                                              child: IconButton(
+                                                  onPressed: () {
+                                                    if(_isExist){
+                                                      shopCartBloc
+                                                          .removeProductFromCart(
+                                                          productModel);
+                                                    }else{
+                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context)!.productNotAvailable)));
+                                                    }
+
+
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.remove,
+                                                    size: 19.0,
+                                                    color: Colors.white,
+                                                  )),
+                                            ),
+                                            Container(
+                                              child: Text(quantity.toString()),
+                                            ),
+                                            Container(
+                                              width: SizeConfig.widhtMulti * 8.0,
+                                              alignment: Alignment.center,
+                                              color:_isExist? ColorsConst.mainColor:Colors.black45,                                              child: Center(
+                                                child: IconButton(
+                                                    onPressed: () {
+                                                      if(_isExist){
+                                                        shopCartBloc
+                                                            .addProductToCart(
+                                                            productModel);
+                                                      }else{
+                                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context)!.productNotAvailable)));
+                                                      }
+
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.add,
+                                                      size: 19.0,
+                                                      color: Colors.white,
+                                                    )),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ],
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    );
-                  },
-                )),
+                              )
+                            ],
+                          );
+                        },
+                      )),
+                ),
+              ],
+            ),
           ),
+          UtilsConst.lang == 'en'
+              ? Positioned(
+                  right: 8.0,
+                  top: 8.0,
+                  child: Container(
+                    height: 28.0,
+                    margin: EdgeInsets.symmetric(horizontal: 6.0),
+                    clipBehavior: Clip.antiAlias,
+                    decoration:
+                        BoxDecoration(shape: BoxShape.circle, color: Colors.red),
+                    child: Center(
+                      child: SizedBox(
+                        height: 28.0,
+                        width: 28.0,
+                        child: IconButton(
+                          onPressed: () {
+                            shopCartBloc
+                                .removeFullQuantityProductFromCart(productModel);
+                            _removeProductFromUi(index,productModel);
+                          },
+                          icon: Icon(
+                            Icons.clear,
+                            color: Colors.white,
+                            size: 12.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ))
+              : Positioned(
+                  left: 8.0,
+                  top: 8.0,
+                  child: Container(
+                    height: 28.0,
+                    margin: EdgeInsets.symmetric(horizontal: 6.0),
+                    clipBehavior: Clip.antiAlias,
+                    decoration:
+                        BoxDecoration(shape: BoxShape.circle, color: Colors.red),
+                    child: Center(
+                      child: SizedBox(
+                        height: 28.0,
+                        width: 28.0,
+                        child: IconButton(
+                          onPressed: () {
+                            shopCartBloc
+                                .removeFullQuantityProductFromCart(productModel);
+                            _removeProductFromUi(index,productModel);
+                          },
+                          icon: Icon(
+                            Icons.clear,
+                            color: Colors.white,
+                            size: 12.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )),
         ],
       ),
     );
@@ -588,14 +722,17 @@ class _ShopScreenState extends State<ShopScreen> {
     return Column(
       children: [
         SizedBox(
-          height: 5,
+          height: 5.0,
         ),
         Expanded(
           child: BlocBuilder<ShopCartBloc, CartState>(
               bloc: shopCartBloc,
               builder: (context, state) {
                 if (state is CartLoading) {
-                  return CircularProgressIndicator();
+                  return Center(child: Container(
+                      width: 25.0,
+                      height: 25.0,
+                      child: CircularProgressIndicator()));
                 } else if (state is CartLoaded) {
                   requestProduct = state.cart.products;
                   if (requestProduct.isEmpty) {
@@ -611,33 +748,52 @@ class _ShopScreenState extends State<ShopScreen> {
                           S.of(context)!.emptyShip,
                           style: GoogleFonts.lato(
                               color: Colors.black45,
-                              fontSize: 16,
+                              fontSize: 16.0,
                               fontWeight: FontWeight.bold),
                         )
                       ],
                     ));
                   } else
-                    return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: state.cart
-                            .productQuantity(state.cart.products)
-                            .keys
-                            .length,
-                        itemBuilder: (context, index) {
-                          return _buildShoppingCard(
-                              productModel: state.cart
-                                  .productQuantity(state.cart.products)
-                                  .keys
-                                  .elementAt(index),
-                              quantity: state.cart
-                                  .productQuantity(state.cart.products)
-                                  .values
-                                  .elementAt(index));
-                        });
+                    return AnimatedList(
+                      key: productListShopKey,
+                      initialItemCount:  state.cart.productQuantity(state.cart.products).keys.length,
+                          itemBuilder: (context, index,animate) {
+                             return _buildShoppingCard(
+                                productModel: state.cart
+                                    .productQuantity(state.cart.products)
+                                    .keys
+                                    .elementAt(index),
+                                quantity: state.cart
+                                    .productQuantity(state.cart.products)
+                                    .values
+                                    .elementAt(index),
+                             animation: animate,
+                               index: index
+                             );
+                          }
+                    );
+                    // return ListView.builder(
+                    //     shrinkWrap: true,
+                    //     itemCount: state.cart
+                    //         .productQuantity(state.cart.products)
+                    //         .keys
+                    //         .length,
+                    //     itemBuilder: (context, index) {
+                    //       return _buildShoppingCard(
+                    //           productModel: state.cart
+                    //               .productQuantity(state.cart.products)
+                    //               .keys
+                    //               .elementAt(index),
+                    //           quantity: state.cart
+                    //               .productQuantity(state.cart.products)
+                    //               .values
+                    //               .elementAt(index));
+                    //     });
+
                 } else {
                   return Container(
                       child: Center(
-                    child: Text('Error in Load Items'),
+                    child: Text(UtilsConst.lang =='en'?'An Error Occurred':'حدث خطا'),
                   ));
                 }
               }),
@@ -647,17 +803,17 @@ class _ShopScreenState extends State<ShopScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Divider(height: 1, color: Colors.black38, thickness: 1),
+              Divider(height: 1.0, color: Colors.black38, thickness: 1.0),
               SizedBox(
-                height: 8,
+                height: 8.0,
               ),
               Text(S.of(context)!.paymentSummary,
                   style: GoogleFonts.lato(
-                      fontSize: 14,
+                      fontSize: 14.0,
                       fontWeight: FontWeight.w800,
                       color: Colors.black87)),
               SizedBox(
-                height: 6,
+                height: 6.0,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -665,7 +821,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   Text(
                     S.of(context)!.total,
                     style: GoogleFonts.lato(
-                        fontSize: 13,
+                        fontSize: 13.0,
                         fontWeight: FontWeight.w800,
                         color: Colors.black54),
                   ),
@@ -675,19 +831,19 @@ class _ShopScreenState extends State<ShopScreen> {
                         if (state is CartLoaded) {
                           return Text(state.cart.totalString,
                               style: GoogleFonts.lato(
-                                  fontSize: 14,
+                                  fontSize: 14.0,
                                   fontWeight: FontWeight.w800,
                                   color: Colors.black54));
                         } else {
                           return Text('',
                               style: TextStyle(
-                                  color: Colors.black54, fontSize: 14));
+                                  color: Colors.black54, fontSize: 14.0));
                         }
                       }),
                 ],
               ),
               SizedBox(
-                height: 10,
+                height: 10.0,
               ),
               BlocBuilder<ShopCartBloc, CartState>(
                   bloc: shopCartBloc,
@@ -707,7 +863,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                 child: Text(
                                     '${S.of(context)!.minimumAlert}  ${state.cart.minimum_pursh}  AED ',
                                     style: GoogleFonts.lato(
-                                        fontSize: 12,
+                                        fontSize: 12.0,
                                         fontWeight: FontWeight.w800,
                                         color: Colors.red))));
                       } else
@@ -720,9 +876,9 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
         ),
         Container(
-          height: 35,
+          height: 35.0,
           margin: EdgeInsets.symmetric(
-              horizontal: SizeConfig.widhtMulti * 3, vertical: 5),
+              horizontal: SizeConfig.widhtMulti * 3.0, vertical: 5.0),
           child: Row(
             children: [
               Expanded(
@@ -762,6 +918,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       borderRadius: BorderRadius.circular(10)),
                   child: MaterialButton(
                     onPressed: () {
+
                       _pageController.nextPage(
                           duration: Duration(milliseconds: 200),
                           curve: Curves.ease);
@@ -1430,7 +1587,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                                 BorderRadius.circular(20),
                                           ),
                                           content: Container(
-                                            height: 100,
+                                            height: 100.0,
                                             width: SizeConfig.screenWidth,
                                             child: Center(
                                                 child: Column(
@@ -1441,19 +1598,19 @@ class _ShopScreenState extends State<ShopScreen> {
                                                       controller:
                                                           _savedNameLocationController,
                                                       style: TextStyle(
-                                                          fontSize: 13),
+                                                          fontSize: 13.0),
                                                       decoration:
                                                           InputDecoration(
                                                               isDense: true,
                                                               contentPadding:
                                                                   EdgeInsets.all(
-                                                                      8),
+                                                                      8.0),
                                                               border:
                                                                   OutlineInputBorder(
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
-                                                                            10),
+                                                                            10.0),
                                                               ),
                                                               hintText: S
                                                                   .of(context)!
@@ -1680,7 +1837,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                   SizedBox(
                                     child: FlutterSwitch(
                                       activeColor: ColorsConst.mainColor,
-                                      width: 60,
+                                      width: 50,
                                       height: 20.0,
                                       valueFontSize: 11.0,
                                       toggleSize: 20.0,
@@ -1782,7 +1939,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                   SizedBox(
                                     child: FlutterSwitch(
                                       disabled: true,
-                                      width: 60,
+                                      width: 50,
                                       height: 20.0,
                                       valueFontSize: 11.0,
                                       toggleSize: 20.0,
@@ -1801,23 +1958,23 @@ class _ShopScreenState extends State<ShopScreen> {
                       }
                     } else {
                       return Container(
-                          height: 40,
+                          height: 40.0,
                           width: double.infinity,
                           child: Text('Error in load data'));
                     }
                   }),
               SizedBox(
-                height: 16,
+                height: 16.0,
               ),
 
               /// Note
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 8),
+                margin: EdgeInsets.symmetric(horizontal: 8.0),
                 padding: EdgeInsets.all(8),
                 width: double.maxFinite,
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(10.0),
                     // border: Border.all(
                     //   color: Colors.black38
                     // ),
@@ -2605,12 +2762,12 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                   30)),
                                                 ),
                                                 child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     IconButton(
                                                         onPressed: () {
-                                                          Navigator.of(
-                                                              context)
+                                                          Navigator.of(context)
                                                               .pop();
                                                         },
                                                         icon: Icon(
@@ -2619,21 +2776,18 @@ class _ShopScreenState extends State<ShopScreen> {
                                                         )),
                                                     Padding(
                                                       padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal:
-                                                          16.0),
+                                                              .symmetric(
+                                                          horizontal: 16.0),
                                                       child: Text(
                                                         S
                                                             .of(context)!
                                                             .payByCard,
                                                         style: TextStyle(
-                                                            color: Colors
-                                                                .black54,
+                                                            color:
+                                                                Colors.black54,
                                                             fontWeight:
-                                                            FontWeight
-                                                                .bold,
-                                                            fontSize:
-                                                            18),
+                                                                FontWeight.bold,
+                                                            fontSize: 18),
                                                       ),
                                                     ),
                                                     SizedBox(
@@ -2645,24 +2799,45 @@ class _ShopScreenState extends State<ShopScreen> {
                                                               PaymentMethodsState>(
                                                           bloc:
                                                               paymentMethodeNumberBloc,
-                                                          listener: (context,state){
-                                                            if(state.state == PaymentMethodsStates.success_deleted)
-                                                              Fluttertoast.showToast(msg: 'successfully deleted',
-                                                                textColor:Colors.white,
-                                                                  gravity: ToastGravity.TOP,
-                                                                backgroundColor:ColorsConst.mainColor,
-                                                                toastLength: Toast.LENGTH_LONG
-                                                              );
-                                                             else if(state.state == PaymentMethodsStates.error_deleted)
-                                                              Fluttertoast.showToast(msg: 'an error occurred',
-                                                                  textColor:Colors.white,
-                                                                  gravity: ToastGravity.TOP,
-                                                                  backgroundColor:Colors.red,
-                                                                  toastLength: Toast.LENGTH_LONG
-                                                              );
-
+                                                          listener:
+                                                              (context, state) {
+                                                            if (state.state ==
+                                                                PaymentMethodsStates
+                                                                    .success_deleted)
+                                                              Fluttertoast.showToast(
+                                                                  msg:
+                                                                      'successfully deleted',
+                                                                  textColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  gravity:
+                                                                      ToastGravity
+                                                                          .TOP,
+                                                                  backgroundColor:
+                                                                      ColorsConst
+                                                                          .mainColor,
+                                                                  toastLength: Toast
+                                                                      .LENGTH_LONG);
+                                                            else if (state
+                                                                    .state ==
+                                                                PaymentMethodsStates
+                                                                    .error_deleted)
+                                                              Fluttertoast.showToast(
+                                                                  msg:
+                                                                      'an error occurred',
+                                                                  textColor: Colors
+                                                                      .white,
+                                                                  gravity:
+                                                                      ToastGravity
+                                                                          .TOP,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .red,
+                                                                  toastLength: Toast
+                                                                      .LENGTH_LONG);
                                                           },
-                                                          builder: (context, state) {
+                                                          builder:
+                                                              (context, state) {
                                                             if (state.state ==
                                                                 PaymentMethodsStates
                                                                     .error) {
@@ -2675,7 +2850,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                     Text(
                                                                         'Error in load your cards, click on refresh!'),
                                                                     SizedBox(
-                                                                      height: 16,
+                                                                      height:
+                                                                          16,
                                                                     ),
                                                                     IconButton(
                                                                         onPressed:
@@ -2683,28 +2859,31 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                           paymentMethodeNumberBloc
                                                                               .getCards();
                                                                         },
-                                                                        icon: Icon(Icons
-                                                                            .refresh))
+                                                                        icon: Icon(
+                                                                            Icons.refresh))
                                                                   ],
                                                                 ),
                                                               );
-                                                            } else if (state.state ==
+                                                            } else if (state
+                                                                    .state ==
                                                                 PaymentMethodsStates
                                                                     .loading) {
                                                               return Center(
-                                                                child: Container(
+                                                                child:
+                                                                    Container(
                                                                   height: 25,
                                                                   width: 25,
                                                                   child: Platform
                                                                           .isIOS
                                                                       ? CupertinoActivityIndicator()
                                                                       : CircularProgressIndicator(
-                                                                          color: Colors
-                                                                              .black54,
+                                                                          color:
+                                                                              Colors.black54,
                                                                         ),
                                                                 ),
                                                               );
-                                                            } else if (state.state ==
+                                                            } else if (state
+                                                                    .state ==
                                                                 PaymentMethodsStates
                                                                     .success)
                                                               return Column(
@@ -2712,24 +2891,23 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                     CrossAxisAlignment
                                                                         .start,
                                                                 children: [
-
                                                                   Container(
                                                                     constraints: BoxConstraints(
-                                                                      minHeight: 50,
-                                                                      maxHeight: 250
-                                                                    ),
-                                                                    margin: EdgeInsets
-                                                                        .symmetric(
-                                                                            horizontal:
-                                                                                20),
+                                                                        minHeight:
+                                                                            50,
+                                                                        maxHeight:
+                                                                            250),
+                                                                    margin: EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            20),
                                                                     child: ListView
                                                                         .separated(
-
                                                                       separatorBuilder:
                                                                           (context,
                                                                               index) {
                                                                         return SizedBox(
-                                                                          height: 8,
+                                                                          height:
+                                                                              8,
                                                                         );
                                                                       },
                                                                       shrinkWrap:
@@ -2742,70 +2920,63 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                               index) {
                                                                         CardModel
                                                                             card =
-                                                                            state.cards[
-                                                                                index];
-                                                                        print('from state');
-                                                                        print(card.cardId.length);
+                                                                            state.cards[index];
+                                                                        print(
+                                                                            'from state');
+                                                                        print(card
+                                                                            .cardId
+                                                                            .length);
                                                                         return Center(
                                                                           child:
                                                                               Container(
-                                                                            width: double
-                                                                                .infinity,
+                                                                            width:
+                                                                                double.infinity,
                                                                             height:
                                                                                 40,
                                                                             decoration: BoxDecoration(
-                                                                                borderRadius: BorderRadius.circular(
-                                                                                    10),
-                                                                                color: Colors
-                                                                                    .grey
-                                                                                    .shade50,
-                                                                                border: Border.all(
-                                                                                    color: Colors.black26,
-                                                                                    width: 2)),
+                                                                                borderRadius: BorderRadius.circular(10),
+                                                                                color: Colors.grey.shade50,
+                                                                                border: Border.all(color: Colors.black26, width: 2)),
                                                                             child:
                                                                                 Row(
-                                                                              mainAxisSize:
-                                                                                  MainAxisSize.min,
+                                                                              mainAxisSize: MainAxisSize.min,
                                                                               children: [
-                                                                                Radio<
-                                                                                    String>(
-                                                                                  value:
-                                                                                      card.cardId,
-                                                                                  groupValue:
-                                                                                      paymentMethodeNumberBloc.state.paymentMethodeCreditGroupValue,
-                                                                                  onChanged:
-                                                                                      (value) {
+                                                                                Radio<String>(
+                                                                                  value: card.cardId,
+                                                                                  groupValue: paymentMethodeNumberBloc.state.paymentMethodeCreditGroupValue,
+                                                                                  onChanged: (value) {
                                                                                     paymentMethodeNumberBloc.changeSelect(value!);
                                                                                   },
-                                                                                  activeColor:
-                                                                                      Colors.green,
+                                                                                  activeColor: Colors.green,
                                                                                 ),
-                                                                                CardIcons.getIcon(brand: card.type) == null?
-
-                                                                                Container(
-                                                                                  width: 30,
-                                                                                  padding: EdgeInsets.all(2),
-                                                                                    decoration: BoxDecoration(
-                                                                                      border: Border.all(
-                                                                                        color: Colors.black38,
-                                                                                      )
-                                                                                    ),
-                                                                                    child: Text(card.type,style: TextStyle(color: Colors.black54,fontWeight: FontWeight.w700,),)):
-
-                                                                                Container(
-                                                                                  width: 30,
-                                                                                    child: Image.asset(CardIcons.getIcon(brand: card.type).toString(),fit: BoxFit.cover,)),
+                                                                                CardIcons.getIcon(brand: card.type) == null
+                                                                                    ? Container(
+                                                                                        width: 30,
+                                                                                        padding: EdgeInsets.all(2),
+                                                                                        decoration: BoxDecoration(
+                                                                                            border: Border.all(
+                                                                                          color: Colors.black38,
+                                                                                        )),
+                                                                                        child: Text(
+                                                                                          card.type,
+                                                                                          style: TextStyle(
+                                                                                            color: Colors.black54,
+                                                                                            fontWeight: FontWeight.w700,
+                                                                                          ),
+                                                                                        ))
+                                                                                    : Container(
+                                                                                        width: 30,
+                                                                                        child: Image.asset(
+                                                                                          CardIcons.getIcon(brand: card.type).toString(),
+                                                                                          fit: BoxFit.cover,
+                                                                                        )),
                                                                                 SizedBox(
-                                                                                  width:
-                                                                                      10,
+                                                                                  width: 10,
                                                                                 ),
                                                                                 Text(
-                                                                                  ' **** **** **** '+ card.cardNumber,
+                                                                                  ' **** **** **** ' + card.cardNumber,
                                                                                   textAlign: TextAlign.center,
-                                                                                  style: GoogleFonts.acme(
-                                                                                      color: Colors.black54,
-                                                                                      fontSize: 14,
-                                                                                      fontWeight: FontWeight.w500),
+                                                                                  style: GoogleFonts.acme(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.w500),
                                                                                 ),
                                                                                 Spacer(),
                                                                                 IconButton(
@@ -2829,90 +3000,88 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                   Center(
                                                                     child:
                                                                         Column(
-                                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                                          mainAxisSize: MainAxisSize.min,
-                                                                          children: [
-                                                                            GestureDetector(
-                                                                      onTap:
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .center,
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      children: [
+                                                                        GestureDetector(
+                                                                          onTap:
                                                                               () async {
                                                                             /// Card Widget
-                                                                            showCardWidget(
-                                                                                context,
+                                                                            showCardWidget(context,
                                                                                 paymentMethodeNumberBloc);
-                                                                      },
-                                                                      child:
+                                                                          },
+                                                                          child:
                                                                               Container(
-                                                                            margin: EdgeInsets
-                                                                                .symmetric(
-                                                                                    horizontal:
-                                                                                        20),
-                                                                            width: SizeConfig
-                                                                                .screenWidth,
-                                                                            height: 35,
+                                                                            margin:
+                                                                                EdgeInsets.symmetric(horizontal: 20),
+                                                                            width:
+                                                                                SizeConfig.screenWidth,
+                                                                            height:
+                                                                                35,
                                                                             decoration: BoxDecoration(
-                                                                                borderRadius:
-                                                                                    BorderRadius.circular(
-                                                                                        10),
-                                                                                color: Colors
-                                                                                    .grey
-                                                                                    .shade50,
-                                                                                border: Border.all(
-                                                                                    color: Colors
-                                                                                        .black26,
-                                                                                    width:
-                                                                                        2)),
-                                                                            child: Row(
-                                                                              mainAxisSize:
-                                                                                  MainAxisSize
-                                                                                      .min,
+                                                                                borderRadius: BorderRadius.circular(10),
+                                                                                color: Colors.grey.shade50,
+                                                                                border: Border.all(color: Colors.black26, width: 2)),
+                                                                            child:
+                                                                                Row(
+                                                                              mainAxisSize: MainAxisSize.min,
                                                                               children: [
                                                                                 Padding(
                                                                                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                                                                  child: Icon(Icons
-                                                                                      .add,size: 18,),
+                                                                                  child: Icon(
+                                                                                    Icons.add,
+                                                                                    size: 18,
+                                                                                  ),
                                                                                 ),
-
                                                                                 Text(
-                                                                                  S
-                                                                                      .of(context)!
-                                                                                      .addCard,
-                                                                                  style: GoogleFonts.lato(
-                                                                                      color: Colors
-                                                                                          .black54,
-                                                                                      fontSize:
-                                                                                          14,
-                                                                                      fontWeight:
-                                                                                          FontWeight.bold),
+                                                                                  S.of(context)!.addCard,
+                                                                                  style: GoogleFonts.lato(color: Colors.black54, fontSize: 14, fontWeight: FontWeight.bold),
                                                                                 )
                                                                               ],
                                                                             ),
-                                                                      ),
-                                                                    ),
-                                                                            SizedBox(height: 16.0,)
-                                                                            ,Center(
-                                                                              child: Container(
-                                                                                margin: EdgeInsets
-                                                                                    .symmetric(
-                                                                                    horizontal:
-                                                                                    20),
-                                                                                width: SizeConfig
-                                                                                    .screenWidth,
-                                                                                child: Row(
-
-                                                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                                                  children: [
-                                                                                    Icon(Icons.info,color: Colors.black87,size: 14.0,),
-                                                                                    Expanded(child: Padding(
-                                                                                      padding:  EdgeInsets.symmetric(horizontal: 8),
-                                                                                      child: Text('Important: The application dose not save the card data',style: TextStyle(color: Colors.black45,fontSize: 11.0,decoration: TextDecoration.underline),),
-                                                                                    )),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                            )
-                                                                          ],
+                                                                          ),
                                                                         ),
+                                                                        SizedBox(
+                                                                          height:
+                                                                              16.0,
+                                                                        ),
+                                                                        Center(
+                                                                          child:
+                                                                              Container(
+                                                                            margin:
+                                                                                EdgeInsets.symmetric(horizontal: 20),
+                                                                            width:
+                                                                                SizeConfig.screenWidth,
+                                                                            child:
+                                                                                Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                Icon(
+                                                                                  Icons.info,
+                                                                                  color: Colors.black87,
+                                                                                  size: 14.0,
+                                                                                ),
+                                                                                Expanded(
+                                                                                    child: Padding(
+                                                                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                                                                  child: Text(
+                                                                                    'Important: The application dose not save the card data',
+                                                                                    style: TextStyle(color: Colors.black45, fontSize: 11.0, decoration: TextDecoration.underline),
+                                                                                  ),
+                                                                                )),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        )
+                                                                      ],
+                                                                    ),
                                                                   ),
                                                                   Spacer(),
                                                                   Center(
@@ -2926,66 +3095,54 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                                 state) async {
                                                                           if (state
                                                                               is CreateOrderSuccessState) {
-                                                                            snackBarSuccessWidget(
-                                                                                context,
+                                                                            snackBarSuccessWidget(context,
                                                                                 S.of(context)!.orderAddedSuccessfully);
                                                                             Navigator.pushAndRemoveUntil(
                                                                                 context,
-                                                                                MaterialPageRoute(
-                                                                                    builder: (context) => CompleteOrderScreen(orderId: state.data.id)),
+                                                                                MaterialPageRoute(builder: (context) => CompleteOrderScreen(orderId: state.data.id)),
                                                                                 (route) => false);
-                                                                            shopCartBloc
-                                                                                .startedShop();
+                                                                            shopCartBloc.startedShop();
                                                                           } else if (state
                                                                               is CreateOrderErrorState) {
-                                                                            snackBarErrorWidget(
-                                                                                context,
+                                                                            snackBarErrorWidget(context,
                                                                                 state.message);
                                                                           }
                                                                         },
                                                                         builder:
                                                                             (context,
                                                                                 state) {
-                                                                          bool isLoading = state
-                                                                                  is CreateOrderLoadingState
+                                                                          bool isLoading = state is CreateOrderLoadingState
                                                                               ? true
                                                                               : false;
                                                                           return AnimatedContainer(
-                                                                            duration: Duration(
-                                                                                milliseconds:
-                                                                                    200),
+                                                                            duration:
+                                                                                Duration(milliseconds: 200),
                                                                             clipBehavior:
                                                                                 Clip.antiAlias,
                                                                             height:
                                                                                 35.0,
                                                                             width: isLoading
                                                                                 ? 60
-                                                                                : SizeConfig.screenWidth *
-                                                                                    0.8,
-                                                                            padding: EdgeInsets.all(
-                                                                                isLoading
-                                                                                    ? 8
-                                                                                    : 0),
-                                                                            margin: EdgeInsets.symmetric(
-                                                                                horizontal:
-                                                                                    20),
-                                                                            decoration: BoxDecoration(
-                                                                                color: ColorsConst
-                                                                                    .mainColor,
-                                                                                borderRadius:
-                                                                                    BorderRadius.circular(10)),
+                                                                                : SizeConfig.screenWidth * 0.8,
+                                                                            padding: EdgeInsets.all(isLoading
+                                                                                ? 8
+                                                                                : 0),
+                                                                            margin:
+                                                                                EdgeInsets.symmetric(horizontal: 20),
+                                                                            decoration:
+                                                                                BoxDecoration(color: ColorsConst.mainColor, borderRadius: BorderRadius.circular(10)),
                                                                             child: isLoading
                                                                                 ? Center(
                                                                                     child: Container(
-                                                                              height: 25,
-                                                                              width: 25,
-                                                                              child: Platform
-                                                                                  .isIOS
-                                                                                  ? CupertinoActivityIndicator(color: Colors.white,)
-                                                                                  : CircularProgressIndicator(
-                                                                                color: Colors.white,
-                                                                              ),
-
+                                                                                    height: 25,
+                                                                                    width: 25,
+                                                                                    child: Platform.isIOS
+                                                                                        ? CupertinoActivityIndicator(
+                                                                                            color: Colors.white,
+                                                                                          )
+                                                                                        : CircularProgressIndicator(
+                                                                                            color: Colors.white,
+                                                                                          ),
                                                                                   ))
                                                                                 : MaterialButton(
                                                                                     onPressed: () {
@@ -3059,7 +3216,6 @@ class _ShopScreenState extends State<ShopScreen> {
                                         // storeId: storeId);
 
                                         else {
-                                          print('44444444444444');
                                           print(addressModel.latitude);
                                           print(addressModel.longitude);
                                           GeoJson geoJson = GeoJson(

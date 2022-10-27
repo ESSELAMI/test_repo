@@ -34,6 +34,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dontHaveAnAccount": MessageLookupByLibrary.simpleMessage("Don\'t have an account ?"),
     "emailAddressIsRequired": MessageLookupByLibrary.simpleMessage("ُmail address is required"),
     "passwordIsRequired": MessageLookupByLibrary.simpleMessage("Password is required"),
+    "invalidPhoneMessage": MessageLookupByLibrary.simpleMessage("invalid phone number"),
 
 
     /// Register Page
@@ -213,6 +214,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "payByCard": MessageLookupByLibrary.simpleMessage("Pay By Card"),
     "addCard": MessageLookupByLibrary.simpleMessage("Add Card"),
     "selectCardAlert": MessageLookupByLibrary.simpleMessage("Please select a card "),
+    "productNotAvailable": MessageLookupByLibrary.simpleMessage("Product Not Available ! ,Delete it to continue"),
 
     /// Products Pages
 

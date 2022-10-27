@@ -8,18 +8,18 @@ import 'package:my_kom/consts/payment_method.dart';
 import 'package:my_kom/module_authorization/presistance/auth_prefs_helper.dart';
 import 'package:my_kom/module_company/models/product_model.dart';
 import 'package:my_kom/module_map/service/map_service.dart';
+import 'package:my_kom/module_orders/exceptions/order_exceptions.dart';
 import 'package:my_kom/module_orders/model/order_model.dart';
 import 'package:my_kom/module_orders/repository/order_repository/order_repository.dart';
 import 'package:my_kom/module_orders/request/accept_order_request/accept_order_request.dart';
 import 'package:my_kom/module_orders/request/order/order_request.dart';
-import 'package:my_kom/module_orders/request/update_order_request/update_order_request.dart';
 import 'package:my_kom/module_orders/response/create_order_response.dart';
 import 'package:my_kom/module_orders/response/order_details/order_details_response.dart';
 import 'package:my_kom/module_orders/response/order_status/order_status_response.dart';
 import 'package:my_kom/module_orders/response/orders/orders_response.dart';
-import 'package:my_kom/module_shoping/bloc/payment_bloc.dart';
+import 'package:my_kom/module_payment/service/payment_service.dart';
+import 'package:my_kom/module_payment/bloc/payment_bloc.dart';
 import 'package:my_kom/module_shoping/exceptions/shop_exceptions.dart';
-import 'package:my_kom/module_shoping/service/payment_service.dart';
 import 'package:rxdart/rxdart.dart';
 import "package:collection/collection.dart";
 class OrdersService {
@@ -189,6 +189,65 @@ return false;
     }
   }
 
+
+  Future<OrderModel?> getDetailsForReorder(String orderId) async {
+    try{
+      OrderDetailResponse? response =   await _orderRepository.getOrderDetails(orderId);
+
+      if(response ==null)
+        return null;
+      print(response.products[0].toJson());
+      OrderModel orderModel = OrderModel() ;
+      orderModel.id = response.id;
+      orderModel.storeId = response.storeId;
+      orderModel.vipOrder = response.vipOrder;
+      orderModel.payment = response.payment;
+      orderModel.paymentState = response.paymentState;
+      orderModel.orderValue = response.orderValue;
+      orderModel.description = response.description;
+      orderModel.ar_description = response.ar_description;
+      orderModel.addressName = response.addressName;
+      orderModel.destination = response.destination;
+      orderModel.phone = response.phone;
+      orderModel.buildingHomeId = response.buildingHomeId;
+      orderModel.startDate =DateTime.parse(response.startDate);//DateTime.parse(response.startDate) ;
+      orderModel.numberOfMonth = response.numberOfMonth;
+      orderModel.deliveryTime = response.deliveryTime;
+      orderModel.cardId = response.cardId;
+      orderModel.customerOrderID = response.customerOrderID;
+      orderModel.productIds = response.products_ides;
+      orderModel.note = response.note;
+      orderModel.orderSource = response.orderSource;
+      /// The current state of the products
+      List<ProductModel> _products = [];
+      for(int i=0;i< response.products.length;i++){
+
+        await _orderRepository.getCurrentStateOfProductById(response.products[i].id).then((rawProduct) {
+         ProductModel _pro = ProductModel.fromJson(rawProduct);
+         _pro.orderQuantity = response.products[i].orderQuantity;
+         _pro.isExist = true;
+         _products.add(_pro);
+        }).catchError((e){
+          print(e.toString());
+           if(e is ProductOrderIsNotExist){
+             ProductModel _pro = response.products[i];
+             _pro.isExist = false;
+             _products.add(_pro);
+           }else{
+             throw e;
+           }
+         });
+
+      }
+      orderModel.products = _products;
+
+      return orderModel;
+
+    }catch(e){
+      return null;
+    }
+  }
+
   Future<OrderModel?> getTrackingDetails(String orderId) async {
     try{
       OrderStatusResponse? response =   await _orderRepository.getTrackingDetails(orderId);
@@ -230,6 +289,10 @@ return false;
 
       /// New Order
       if (!reorder) {
+
+        ///For avoid the modification process from the ui (amount = 0.0)
+        amount = 0.0;
+
         Map<ProductModel, int> productsMap = Map<ProductModel, int>();
 
         Map<String, List<ProductModel>> _gruoped_products_list = groupBy(
@@ -244,15 +307,20 @@ return false;
         List<String> products_ides = [];
 
         productsMap.forEach((key, value) {
-          key.orderQuantity = value;
-          description =
-              description + key.orderQuantity.toString() + ' ' + key.title +
-                  ' + ';
-          ar_Desccription =
-              ar_Desccription + key.orderQuantity.toString() + ' ' +
-                  key.title2.toString() + ' + ';
-          newproducts.add(key);
-          products_ides.add(key.id);
+
+          ///product is exits in data base (for reorder , old products)
+          if(key.isExist){
+            amount += key.price * value;
+            key.orderQuantity = value;
+            description =
+                description + key.orderQuantity.toString() + ' ' + key.title +
+                    ' + ';
+            ar_Desccription =
+                ar_Desccription + key.orderQuantity.toString() + ' ' +
+                    key.title2.toString() + ' + ';
+            newproducts.add(key);
+            products_ides.add(key.id);
+          }
         });
 
         if (customer_order_id == null)
@@ -408,7 +476,8 @@ return false;
       items.add({
         'id':element.id,
         'price':element.price,
-        'quantity': element.quantity
+        'quantity': element.orderQuantity
+
       });
     });
     try{

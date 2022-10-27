@@ -41,7 +41,6 @@ class CompanyService {
       /// Default Store
       ///
       if(storeId == ''){
-        print(' store not found !!!!!');
         return null;
 
       }else{
@@ -52,12 +51,9 @@ class CompanyService {
         ///
          _preferencesHelper.setCurrentSubArea(zone);
        await _getStoreFromZone(storeId);
-        print(' store found !!!!!');
         return storeId;
       }
     }catch(e){
-      print('Exception !!!!!!!!!!!!!!!!!!!!!');
-      print(e);
       return null;
     }
   }
@@ -116,7 +112,6 @@ class CompanyService {
           print(map);
           map['id'] = element.id;
           ProductModel productModel = ProductModel.fromJson(map);
-         // if(!productModel.isRecommended)
           productsList.add(productModel);
         });
 

@@ -12,7 +12,7 @@ import 'package:my_kom/module_authorization/bloc/cubits.dart';
 import 'package:my_kom/module_authorization/bloc/register_bloc.dart';
 import 'package:my_kom/module_authorization/enums/user_role.dart';
 import 'package:my_kom/module_authorization/requests/register_request.dart';
-import 'package:my_kom/module_authorization/screens/login_automatically.dart';
+import 'package:my_kom/module_home/navigator_routes.dart';
 import 'package:my_kom/module_map/bloc/map_bloc.dart';
 import 'package:my_kom/module_map/models/address_model.dart';
 import 'package:my_kom/utils/size_configration/size_config.dart';
@@ -20,14 +20,14 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:my_kom/generated/l10n.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final RegisterBloc _bloc = RegisterBloc();
   RegisterScreen({Key? key}) : super(key: key);
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> with WidgetsBindingObserver{
+class _RegisterScreenState extends State<RegisterScreen> {
+  late final RegisterBloc _bloc;
   final GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>();
   late final MapBloc  _mapBloc;
   final TextEditingController _registerEmailController =
@@ -50,6 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> with WidgetsBindingObse
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       userRole =  ModalRoute.of(context)!.settings.arguments as UserRole;
     });
+    _bloc = RegisterBloc();
     _mapBloc =MapBloc();
     _mapBloc.getCurrentPosition();
     super.initState();
@@ -59,19 +60,13 @@ class _RegisterScreenState extends State<RegisterScreen> with WidgetsBindingObse
 
   @override
   void dispose() {
+    _bloc.close();
     _mapBloc.close();
     cubit1.close();
     cubit2.close();
     super.dispose();
   }
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // TODO: implement didChangeAppLifecycleState
-    super.didChangeAppLifecycleState(state);
-    if(state == AppLifecycleState.inactive || state == AppLifecycleState.detached){
-    widget._bloc.deleteFakeAccount();
-    }
-  }
+
 
 
   late AddressModel addressModel;
@@ -470,15 +465,6 @@ class _RegisterScreenState extends State<RegisterScreen> with WidgetsBindingObse
                                             return   GestureDetector(
                                               onTap: (){
                                                 _mapBloc.getCurrentPosition();
-                                                // Navigator.pushNamed(
-                                                //     context, MapRoutes.MAP_SCREEN,arguments: true)
-                                                //     .then((value) {
-                                                //   if (value != null) {
-                                                //     addressModel = (value as AddressModel);
-                                                //     _registerAddressController.text =
-                                                //         addressModel.description;
-                                                //   }
-                                                // });
                                               },
                                               child: Container(
                                                 width: 40,
@@ -662,19 +648,15 @@ class _RegisterScreenState extends State<RegisterScreen> with WidgetsBindingObse
                               height:25,
                             ),
                             BlocConsumer<RegisterBloc, RegisterStates>(
-                              bloc: widget._bloc,
+                              bloc: _bloc,
                               listener: (context, state) {
                                 if (state is RegisterSuccessState) {
-                                  EasyLoading.show();
-                                  String _email  =_registerEmailController.text.trim();
-                                        String _password  =_registerPasswordController.text.trim();
+                                  EasyLoading.showSuccess(state.data);
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, NavigatorRoutes.NAVIGATOR_SCREEN,(route)=> false);
 
-                                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>
-                                        LoginAutomatically(email: _email, password: _password)
-                                        ),(route)=>false);
                                 } else if (state is RegisterErrorState) {
                                   EasyLoading.showError(state.message);
-
                                 }
                               },
                               builder: (context, state) {
@@ -682,13 +664,13 @@ class _RegisterScreenState extends State<RegisterScreen> with WidgetsBindingObse
                                   return Center(
                                       child: Container(
                                           margin: EdgeInsets.all(20),
-                                          width: 25,
-                                          height: 25,
+                                          width: 25.0,
+                                          height: 25.0,
                                           child:Platform.isIOS?CupertinoActivityIndicator(): CircularProgressIndicator(color: ColorsConst.mainColor,)));
                                 else
                                   return ListTile(
                                     title: Container(
-                                        height:55,
+                                        height:55.0,
                                         padding: EdgeInsets.symmetric(vertical: 10,horizontal: 20),
                                         decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(10)
@@ -728,7 +710,7 @@ class _RegisterScreenState extends State<RegisterScreen> with WidgetsBindingObse
                                                           address: addressModel,
                                                           phone: phone
                                                       ) ;
-                                                      widget._bloc.register(request:request);
+                                                      _bloc.register(request:request);
 
                                                     }
 
@@ -750,6 +732,8 @@ class _RegisterScreenState extends State<RegisterScreen> with WidgetsBindingObse
                         ),
                       ),
                     ),
+
+                    SizedBox(height: 30,),
 
                   ],
                 ),

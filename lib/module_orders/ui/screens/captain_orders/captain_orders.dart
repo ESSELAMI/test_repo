@@ -9,16 +9,22 @@ import 'package:my_kom/consts/utils_const.dart';
 import 'package:my_kom/module_authorization/bloc/is_loggedin_cubit.dart';
 import 'package:my_kom/module_authorization/screens/widgets/login_sheak_alert.dart';
 import 'package:my_kom/module_authorization/screens/widgets/top_snack_bar_widgets.dart';
+import 'package:my_kom/module_map/models/address_model.dart';
 import 'package:my_kom/module_orders/model/order_model.dart';
 import 'package:my_kom/module_orders/orders_routes.dart';
 import 'package:my_kom/module_orders/service/orders/orders.service.dart';
 import 'package:my_kom/module_orders/state_manager/batch_bloc.dart';
 import 'package:my_kom/module_orders/state_manager/captain_orders/orders_bloc.dart';
 import 'package:my_kom/module_orders/state_manager/new_order/new_order.state_manager.dart';
+import 'package:my_kom/module_orders/state_manager/order_detail_bloc.dart';
 import 'package:my_kom/module_orders/ui/widgets/no_data_for_display_widget.dart';
+import 'package:my_kom/module_shoping/bloc/shopping_cart_bloc.dart';
+import 'package:my_kom/module_shoping/models/cart_arrguments.dart';
+import 'package:my_kom/module_shoping/shoping_routes.dart';
 import 'package:my_kom/utils/size_configration/size_config.dart';
 import 'package:my_kom/generated/l10n.dart';
 import 'package:load/load.dart';
+
 class UserOrdersScreen extends StatefulWidget {
 
   @override
@@ -28,7 +34,7 @@ class UserOrdersScreen extends StatefulWidget {
 class _UserOrdersScreenState extends State<UserOrdersScreen> {
   late final PendingOrdersListBloc _pendingOrdersListBloc ;
   late final FinishedOrdersListBloc _finishedOrdersListBloc ;
-  late final NewOrderBloc _orderBloc ;
+  late final OrderDetailBloc _orderDetailBloc ;
   late final ScrollController _pendingOrdersScrollController ;
   late final ScrollController _finishedOrdersScrollController ;
 
@@ -41,7 +47,7 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
   void initState() {
     current_tap = CURRENT_ORDER;
     _ordersService = OrdersService();
-    _orderBloc  = NewOrderBloc(_ordersService);
+    _orderDetailBloc  = OrderDetailBloc();
     _pendingOrdersListBloc = PendingOrdersListBloc(_ordersService);
     _finishedOrdersListBloc = FinishedOrdersListBloc(_ordersService);
     isLogginCubit = IsLogginCubit();
@@ -54,11 +60,10 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
   }
   @override
   void dispose() {
-    print('orders screen dispose !!!!!!!');
     isLogginCubit.close();
     _pendingOrdersListBloc.close();
     _finishedOrdersListBloc.close();
-    _orderBloc.close();
+    _orderDetailBloc.close();
     isLogginCubit.close();
     _pendingOrdersScrollController.dispose();
     _finishedOrdersScrollController.dispose();
@@ -103,13 +108,13 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8,vertical: 5),
                     child: Text(S.of(context)!.orders,style: GoogleFonts.lato(
-                        fontSize: 26,
+                        fontSize: 21,
                         fontWeight: FontWeight.bold,
                         color: Colors.black54
                     ),),
                   ),
                   SizedBox(height: 8,),
-                  getAccountSwitcher(),
+                  getOrderSwitcher(),
                   SizedBox(height: 8,),
 
                   Expanded(
@@ -134,7 +139,7 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
 
 
   }
-  Widget getAccountSwitcher() {
+  Widget getOrderSwitcher() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: SizeConfig.widhtMulti * 3),
       child: Row(
@@ -558,14 +563,14 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Text((UtilsConst.lang == 'en')?orders[index].description:orders[index].ar_description,overflow: TextOverflow.ellipsis,maxLines: 2,style: GoogleFonts.lato(
 
-                                    fontSize: 12,
+                                    fontSize: 12.0,
 
                                     color: Colors.black87,
                                     fontWeight: FontWeight.w800
                                 ),
                                 ),
                               ),
-                              SizedBox(height: 4,),
+                              SizedBox(height: 4.0,),
 
                               Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -576,7 +581,7 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 6),
                                       child: Text(orders[index].addressName,overflow: TextOverflow.ellipsis,style: GoogleFonts.lato(
-                                        fontSize: 12,
+                                        fontSize: 12.0,
                                         color: Colors.black45,
                                         fontWeight: FontWeight.w800,
 
@@ -585,19 +590,19 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                                   )
 
                                 ],),
-                              SizedBox(height: 6,),
+                              SizedBox(height: 6.0,),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Text('${orders[index].orderValue.toString()}  ${UtilsConst.lang == 'en'? 'AED':'د.إ'}' ,style: GoogleFonts.lato(
-                                    fontSize: 14,
+                                    fontSize: 14.0,
                                     color: ColorsConst.mainColor,
                                     fontWeight: FontWeight.bold
                                 )),
                               ),
-                              SizedBox(height: 6,),
+                              SizedBox(height: 6.0,),
                               Spacer(),
                               Container(
-                                height: 30,
+                                height: 30.0,
                                 child: Row(
                                   children: [
                                     Expanded(
@@ -608,7 +613,7 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                                             ,
                                             border: Border.all(
                                                 color: ColorsConst.mainColor,
-                                                width: 2
+                                                width: 2.0
                                             ),
                                             borderRadius: BorderRadius.circular(10)
                                         ),
@@ -623,18 +628,18 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(width: SizeConfig.widhtMulti * 3,),
+                                    SizedBox(width: SizeConfig.widhtMulti * 3.0,),
                                     Expanded(child:
                                     Container(
-                                      height: 30,
+                                      height: 30.0,
                                       clipBehavior: Clip.antiAlias,
                                       decoration: BoxDecoration(
                                           color: ColorsConst.mainColor,
-                                          borderRadius: BorderRadius.circular(10)
+                                          borderRadius: BorderRadius.circular(10.0)
                                       ),
                                       child: MaterialButton(
                                         onPressed: () {
-                                          _orderBloc.reorder(orders[index].id);
+                                          _orderDetailBloc.getDetailForReorder(orderId: orders[index].id);
                                         },
                                         child: Text(S.of(context)!.reOrder, style: TextStyle(color: Colors.white,
                                             fontSize: 14.0),),
@@ -651,38 +656,45 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                         );
                       },
                     ),
-                    BlocListener<NewOrderBloc,CreateOrderStates>(
-                      bloc: _orderBloc,
+                    BlocListener<OrderDetailBloc,OrderDetailStates>(
+                      bloc: _orderDetailBloc,
                       listener: (context,state)async{
-                      if(state is CreateOrderSuccessState)
+                      if(state is OrderDetailSuccessState)
                       {
                         hideLoadingDialog();
-                        snackBarSuccessWidget(context,UtilsConst.lang == 'en'? 'Order Created Successfully!!':'تم إرسال الطلب بنجاح');
+                        await shopCartBloc.startedShop();
+
+                        state.data.products.forEach((element) {
+                          shopCartBloc.addProductsToCart(element, element.orderQuantity == null ?0:element.orderQuantity!);
+                        });
+                        AddressModel _address = AddressModel(description: state.data.addressName, latitude: state.data.destination.lat, longitude: state.data.destination.lon, geoData: {});
+                        CartArguments _cart_arg = CartArguments(addressModel: _address, phone: state.data.phone, note: state.data.note, buildingId: state.data.buildingHomeId, vip: state.data.vipOrder);
+                        Navigator.pushNamedAndRemoveUntil(context, ShopingRoutes.SHOPE_SCREEN, (route) => false,arguments:_cart_arg );
                       }
-                      else if(state is CreateOrderErrorState)
+                      else if(state is OrderDetailErrorState)
                       {
                         hideLoadingDialog();
-                        snackBarErrorWidget(context,UtilsConst.lang == 'en'?  'The Order Was Not Created!!':'حدث خطأ, يرجى المحاولة مجددا');
+                        snackBarErrorWidget(context,UtilsConst.lang == 'en'?  'An error occurred':'حدث خطأ, يرجى المحاولة مجددا');
                       }
-                      else if(state is CreateOrderLoadingState){
+                      else if(state is OrderDetailLoadingState){
                         showCustomLoadingWidget(
                           Center(
                             child: Container(
-                              padding: const EdgeInsets.all(30),
+                              padding: const EdgeInsets.all(30.0),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
                                   Container(
-                                    width: 40,
-                                    height: 40,
+                                    width: 40.0,
+                                    height: 40.0,
                                     color: Colors.transparent,
                                     child: Platform.isIOS?CupertinoActivityIndicator(
-                                      radius: 12,
+                                      radius: 12.0,
                                       color:  Colors.white,
                                     ):CircularProgressIndicator(color: Colors.white,),
                                   ),
                                   Container(
-                                    height: 10,
+                                    height: 10.0,
                                   ),
 
                                 ],
@@ -723,8 +735,8 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
               );}
           else  return Center(
               child: Container(
-                width: 40,
-                height: 40,
+                width: 40.0,
+                height: 40.0,
                 child:Platform.isIOS ?CupertinoActivityIndicator(): CircularProgressIndicator(color: ColorsConst.mainColor,),
               ),
             );

@@ -1,6 +1,5 @@
 
 import 'package:my_kom/consts/order_status.dart';
-import 'package:my_kom/consts/payment_method.dart';
 import 'package:my_kom/module_company/models/product_model.dart';
 import 'package:my_kom/module_orders/response/orders/orders_response.dart';
 
@@ -30,7 +29,6 @@ class OrderDetailResponse {
   late String? orderSource;
 
   OrderDetailResponse.fromJson(Map<String, dynamic> json) {
-    print(json);
     this.id = json['id'];
     this.storeId = json['store_Id'] == null? 'store_Id':json['store_Id'];
     this.cardId =json['card_id'] ;
@@ -81,4 +79,5 @@ class OrderDetailResponse {
       }
    this.status = state;
   }
+
 }

@@ -9,7 +9,7 @@ class AuthRepository {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<String?> register(String email, String password) async {
+  Future<UserCredential?> createUserWithEmailAndPassword(String email, String password) async {
     //var user = _firebaseAuth.currentUser;
 
     try {
@@ -18,7 +18,7 @@ class AuthRepository {
         email: email,
         password: password,
       );
-      return resualt.user!.uid;
+      return resualt;
     }catch(e){
       throw e;
     }
@@ -49,11 +49,11 @@ class AuthRepository {
 
   }
 
-  Future<bool> createProfile(ProfileRequest request) async {
-    var user = _firebaseAuth.currentUser;
+  Future<bool> createProfile({required ProfileRequest request}) async {
+    String uid = _firebaseAuth.currentUser!.uid;
     try{
       var existingProfile =
-      await _firestore.collection('users').doc(user!.uid).set(request.toJson());
+      await _firestore.collection('users').doc(uid).set(request.toJson());
       return true;
     }catch(e){
       throw e;
@@ -81,9 +81,11 @@ class AuthRepository {
   Future<ProfileResponse> getProfile(String uid) async {
     try {
       var existProfile = await _firestore.collection('users').doc(uid).get();
+      if(existProfile.data() == null)
+        throw Exception();
+
       Map<String  ,dynamic > result = existProfile.data()!;
-      print('result');
-      print(result);
+
       return ProfileResponse.fromJson(result);
     } catch (e) {
       throw Exception();
@@ -91,8 +93,6 @@ class AuthRepository {
   }
 
   Future<bool>editProfile(String uid, EditProfileRequest request)  async {
-    print('***************************');
-    print(request.toJson());
 
     var existingProfile =
     await _firestore.collection('users').doc(uid).get();
@@ -123,15 +123,26 @@ class AuthRepository {
 
   Future deleteFakeProfile(uid) async{
     try{
-
-         _firestore.collection('users').doc(uid).delete();
-
+      return _firestore.runTransaction( (Transaction transaction) async {
+       await _firestore.collection('users').doc(uid).delete();
+       await FirebaseAuth.instance.currentUser!.delete();
+      });
 
     }catch(e){
 
     }
 
 
+  }
+
+ Future<bool> checkExistAccount(uid) async{
+
+   return await _firestore.collection('users').doc(uid).get().then((value) => value.exists);
+ }
+
+  updateUserProfile(Map<String, String> map)async {
+    String _uid = _firebaseAuth.currentUser!.uid;
+   await _firestore.collection('users').doc(_uid).update(map).catchError((e){});
   }
 
 }

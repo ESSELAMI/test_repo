@@ -2,6 +2,7 @@ import 'package:my_kom/module_authorization/enums/user_role.dart';
 import 'package:my_kom/module_map/models/address_model.dart';
 
 class RegisterRequest {
+  late final String stripeCustomerId;
   late final String email;
   late final String password;
   late final UserRole userRole;
@@ -15,6 +16,7 @@ class RegisterRequest {
 
   RegisterRequest.fromJson(Map<String, dynamic> map) {
     this.email = map['email'];
+    this.stripeCustomerId = map['stripeCustomerId']== null? '':map['stripeCustomerId'];
     this.password = map['password'];
     this.userRole = map['userRole'];
     this.userName = map['userName'];
@@ -24,9 +26,10 @@ class RegisterRequest {
   }
 
   Map<String, dynamic> toJson() {
+
     Map<String, dynamic> map = {};
     map['email'] = this.email;
-    //map['password'] = this.password ;
+    map['stripeCustomerId'] = this.stripeCustomerId;
     map['userRole'] = this.userRole.name;
     map['userName'] = this.userName;
     map['phone'] = this.phone;

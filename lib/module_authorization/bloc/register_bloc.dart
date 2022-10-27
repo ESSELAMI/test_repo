@@ -33,7 +33,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterStates> {
     });
   }
 
- 
+
 
   register({required RegisterRequest request}) async {
     this.add(RegisterLoadingEvent());
@@ -44,8 +44,33 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterStates> {
         this.add(RegisterErrorEvent(data: value.data));
     });
   }
-  
 
+  registerByGoogle() async {
+    this.add(RegisterLoadingEvent());
+    _service.verifyWithGoogle(isRegister: true).then((value) {
+      if (value.state) {
+        print('emit success');
+
+        this.add(RegisterSuccessEvent(data: value.data));
+      } else{
+        print('emit error');
+        this.add(RegisterErrorEvent(data: value.data));
+      }
+
+    });
+  }
+  registerByApple() async {
+    this.add(RegisterLoadingEvent());
+    _service.verifyWithApple(isRegister: true).then((value) {
+      if (value.state) {
+
+        this.add(RegisterSuccessEvent(data: value.data));
+      } else{
+        this.add(RegisterErrorEvent(data: value.data));
+      }
+
+    });
+  }
 
 
 
@@ -54,8 +79,6 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterStates> {
 
   }
 
-  ///
-///
 
 
 }

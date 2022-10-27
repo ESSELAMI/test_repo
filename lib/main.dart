@@ -18,7 +18,6 @@ import 'package:my_kom/module_home/navigator_routes.dart';
 import 'package:my_kom/module_localization/service/localization_service/localization_b;oc_service.dart';
 import 'package:my_kom/module_notifications/service/fire_notification_service/fire_notification_service.dart';
 import 'package:my_kom/module_orders/orders_module.dart';
-import 'package:my_kom/module_payment/stripe_payment_service.dart';
 import 'package:my_kom/module_profile/module_profile.dart';
 import 'package:my_kom/module_shoping/shoping_module.dart';
 import 'package:my_kom/module_splash/splash_module.dart';
@@ -31,6 +30,7 @@ import '.env' as env;
 
 Future<void> backgroundHandler(RemoteMessage message)async{
   await Firebase.initializeApp();
+  // for android
   //FireNotificationService().display(message.notification!);
 }
 void main() async {
@@ -98,9 +98,8 @@ class MyApp extends StatefulWidget {
   final OrdersModule _ordersModule;
   final ProfileModule _profileModule;
   final FireNotificationService _fireNotificationService;
-  final StripePaymentService _paymentService;
   MyApp(this._localizationService, this._aboutModule,this._splashModule, this._navigatorModule,
-      this._authorizationModule,this._mapModule, this._companyModule,this._shopingModule,this._ordersModule,this._profileModule,this._fireNotificationService,this._paymentService);
+      this._authorizationModule,this._mapModule, this._companyModule,this._shopingModule,this._ordersModule,this._profileModule,this._fireNotificationService);
 
   @override
   State<MyApp> createState() => _MyAppState();

@@ -198,7 +198,6 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
         PaymentMethodParams.card(paymentMethodData: PaymentMethodData(
           billingDetails: billingDetails,
         )),
-
       );
 
       /// Setup Intent (Attach payment method with customer)
@@ -209,9 +208,6 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
             'paymentMethodId':paymentMethod.id,
             'customerId':_customer
           }));
-      print('att');
-      print(response.body);
-      print('cards from stripe');
       this.add(PaymentSuccess(paymentMethod));
 
     }catch(e){

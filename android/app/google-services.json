@@ -14,7 +14,23 @@
       },
       "oauth_client": [
         {
-          "client_id": "686046357650-j1nnmjh3ctfqgaql2ei001shks45nngj.apps.googleusercontent.com",
+          "client_id": "686046357650-9ehaig9lrik5b1vjm8lknilmuo55av2p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.district.mykomapp",
+            "certificate_hash": "b1841a085dd7fff7f2a272aaaf1403c6fcc0ce14"
+          }
+        },
+        {
+          "client_id": "686046357650-hunghkvi038bo89f8t7ppafpn6bdco1a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.district.mykomapp",
+            "certificate_hash": "75c4345c9a1dccc7ea79c3de98aa53e474eb73e6"
+          }
+        },
+        {
+          "client_id": "686046357650-luaspv21tdnsu9g8bg49bkkut96gsu7d.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.district.mykomapp",
@@ -37,6 +53,13 @@
             {
               "client_id": "686046357650-20paprn35nbtqud64gg3dgiejml08m6j.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "686046357650-gn6jcdiveq14oqe2jjr0ki9phsu6ri28.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.districtapp.mykomapp"
+              }
             }
           ]
         }
@@ -66,6 +89,13 @@
             {
               "client_id": "686046357650-20paprn35nbtqud64gg3dgiejml08m6j.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "686046357650-gn6jcdiveq14oqe2jjr0ki9phsu6ri28.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.districtapp.mykomapp"
+              }
             }
           ]
         }
@@ -103,6 +133,13 @@
             {
               "client_id": "686046357650-20paprn35nbtqud64gg3dgiejml08m6j.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "686046357650-gn6jcdiveq14oqe2jjr0ki9phsu6ri28.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.districtapp.mykomapp"
+              }
             }
           ]
         }

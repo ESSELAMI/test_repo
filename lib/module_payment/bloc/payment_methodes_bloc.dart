@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_kom/module_authorization/presistance/auth_prefs_helper.dart';
+import 'package:my_kom/module_authorization/service/auth_service.dart';
+import 'package:my_kom/module_payment/service/payment_service.dart';
 import 'package:my_kom/module_shoping/models/card_model.dart';
 import 'package:http/http.dart' as http;
 class PaymentMethodsBloc extends Cubit<PaymentMethodsState> {
   final String _paymentEndPointPaymentMethodsUrl = 'https://us-central1-mykom-tech-dist.cloudfunctions.net/StripePayEndpointGetPaymentMethods';
   final String _paymentEndPointDeleteCardUrl = 'https://us-central1-mykom-tech-dist.cloudfunctions.net/StripePayEndpointDetach';
 
+  final AuthService _authService = AuthService();
   final AuthPrefsHelper _authPrefsHelper = AuthPrefsHelper();
 
   PaymentMethodsBloc()
@@ -22,8 +25,13 @@ class PaymentMethodsBloc extends Cubit<PaymentMethodsState> {
 
     try{
       String? _customer = await _authPrefsHelper.getStripeCustomerId();
-      print('customer');
-      print(_customer);
+
+      /// For Old Account registered in the application
+      if(_customer == ''){
+        _customer = await PaymentService().setupIntent();
+        _authService.updateStripeCustomer(_customer);
+      }
+
       final url = Uri.parse(_paymentEndPointPaymentMethodsUrl);
       final response = await http.post(
           url,

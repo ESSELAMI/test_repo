@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_kom/consts/utils_const.dart';
 import 'package:my_kom/utils/size_configration/size_config.dart';
 
 class ExpadedTextWidget extends StatefulWidget {
@@ -35,8 +36,8 @@ class _ExpadedTextWidgetState extends State<ExpadedTextWidget> {
           Text(hiddenText? firstHalf + '...':firstHalf + secondHalf,
             style: TextStyle(
               height: 1.2,
-              fontSize: SizeConfig.titleSize * 2.6,
-              fontWeight: FontWeight.w800,
+              fontSize: 16.0,
+              fontWeight: FontWeight.w600,
               color: Colors.black45
             ),
           ),
@@ -49,7 +50,7 @@ class _ExpadedTextWidgetState extends State<ExpadedTextWidget> {
             },
             child: Row(
               children: [
-                Text(hiddenText ?'show more': 'close',style: TextStyle(color: Colors.blue),),
+                Text(hiddenText ?UtilsConst.lang=='en'?'show more':'المزيد': UtilsConst.lang=='en'?'close':'عرض اقل',style: TextStyle(color: Colors.blue),),
                 Icon(hiddenText ? Icons.arrow_drop_down:Icons.arrow_drop_up,color: Colors.blue,)
               ],
             ),

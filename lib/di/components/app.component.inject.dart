@@ -29,7 +29,7 @@ import 'package:my_kom/module_orders/orders_module.dart';
 import 'package:my_kom/module_orders/ui/screens/captain_orders/captain_orders.dart';
 import 'package:my_kom/module_orders/ui/screens/order_detail.dart';
 import 'package:my_kom/module_orders/ui/screens/order_status/order_status_screen.dart';
-import 'package:my_kom/module_payment/stripe_payment_service.dart';
+import 'package:my_kom/module_profile/bloc/profile_bloc.dart';
 import 'package:my_kom/module_profile/module_profile.dart';
 import 'package:my_kom/module_profile/screen/profile_screen.dart';
 import 'package:my_kom/module_shoping/screen/shop_screen.dart';
@@ -41,6 +41,7 @@ class AppComponentInjector implements AppComponent {
 
   LocalizationService? _singletonLocalizationService;
   CompanyService? _singletonCompanyService;
+  ProfileBloc? _singletonProfileBloc ;
   MapBloc? _singletonMapBloc;
   static Future<AppComponent> create() async {
     final injector = AppComponentInjector._();
@@ -59,7 +60,6 @@ class AppComponentInjector implements AppComponent {
       _createOrderModule(),
       _createProfileModule(),
       _createNotificationService(),
-      _createPaymentModule(),
 
       );
 
@@ -75,6 +75,7 @@ class AppComponentInjector implements AppComponent {
   NavigatorModule _createNavigatorModule() {
     _singletonCompanyService ??= CompanyService();
     _singletonMapBloc ??= MapBloc();
+    _singletonProfileBloc ??= ProfileBloc();
     UtilsConst.isInit = true;
     return NavigatorModule( NavigatorScreen(
         homeScreen: HomeScreen(mapBloc: _singletonMapBloc!,filterZoneCubit: FilterZoneCubit(),allCompanyBloc: AllCompanyBloc(_singletonCompanyService!),
@@ -83,7 +84,7 @@ class AppComponentInjector implements AppComponent {
           recommendedBloc: RecommendedProductBloc(_singletonCompanyService!),
             ),
         orderScreen: UserOrdersScreen(),
-        profileScreen: ProfileScreen(),
+        profileScreen: ProfileScreen(profileBloc:_singletonProfileBloc!,),
         shopScreen:ShopScreen(),
         settingScreen: SettingScreen(localizationService:_singletonLocalizationService!),
     ),
@@ -98,10 +99,9 @@ class AppComponentInjector implements AppComponent {
   }
   ShopingModule _createShopingModule()=> ShopingModule(ShopScreen());
   OrdersModule _createOrderModule()=> OrdersModule( UserOrdersScreen(),OrderDetailScreen(),OrderStatusScreen());
-  ProfileModule _createProfileModule()=> ProfileModule(ProfileScreen());
+  ProfileModule _createProfileModule()=> ProfileModule(ProfileScreen(profileBloc: _singletonProfileBloc!,));
   CompanyModule _createCompanyModule()=> CompanyModule(CompanyProductScreen(),PriductDetailScreen());
   FireNotificationService _createNotificationService()=> FireNotificationService();
-  StripePaymentService _createPaymentModule()=> StripePaymentService();
   MyApp get app {
     return _createApp();
   }

@@ -1,8 +1,5 @@
 
-
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:my_kom/consts/order_status.dart';
-import 'package:my_kom/consts/payment_method.dart';
 import 'package:my_kom/module_company/models/product_model.dart';
 import 'package:my_kom/module_orders/response/orders/orders_response.dart';
 

@@ -34,15 +34,22 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+
   # Firebase Libs
   #firebase_core: ^1.10.0
   firebase_auth: ^3.3.17
   cloud_firestore: ^3.1.13
+  firebase_analytics: ^9.2.1
   firebase_core: ^1.15.0
   firebase_storage: ^10.2.17
   firebase_messaging: ^11.4.1
   flutter_local_notifications: ^7.0.0
   overlay_support: ^2.0.1
+
+  # Google Sign In
+  google_sign_in: ^5.4.2
+  sign_in_with_apple: ^4.1.0
+  
   # Path
   path: ^1.8.0
 
@@ -50,6 +57,8 @@ dependencies:
   # Charts
   charts_flutter: ^0.12.0
 
+  # Crypto For SHA1
+  crypto: ^3.0.2
 
   # Image Network
   # image_picker: ^0.8.5+3
@@ -70,7 +79,6 @@ dependencies:
 
   # Payment
   flutter_stripe: 4.0.0
-
 
   # Network Agents
   http: ^0.13.5
@@ -96,6 +104,8 @@ dependencies:
   # Connectivity Plus (check internet)
   #connectivity_plus: ^2.0.2
 
+  # Validators
+  validators: ^3.0.0
 
   # Switch
   flutter_switch: ^0.3.2
@@ -151,13 +161,15 @@ dependencies:
   top_snackbar_flutter: ^1.0.2
   flutter_staggered_animations: ^1.0.0
 
-   #MOdel Sheet
+   #Model Sheet
   modal_bottom_sheet: ^2.0.1
 
+  # Svg Pic
   flutter_svg: ^1.0.3
   url_launcher: ^6.1.2
   # font_awesome_flutter: ^10.1.0
 
+  # Flutter Toast
   fluttertoast: ^8.0.9
 
   # step_progress_indicator: ^1.0.2

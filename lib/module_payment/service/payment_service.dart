@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:my_kom/module_authorization/presistance/auth_prefs_helper.dart';
-import 'package:my_kom/module_shoping/bloc/payment_bloc.dart';
+import 'package:my_kom/module_payment/bloc/payment_bloc.dart';
 import 'package:http/http.dart' as http;
 
 class PaymentService {
@@ -42,7 +42,7 @@ Future<PaymentMethod> paymentSetupIntent(BillingDetails billingDetails) async {
      final paymentIntentResults = await _callPaymentEndPointMethodId(
          useStripeSdk: true,
          paymentMethodId: paymentMethodID,
-         currency: 'usd',
+         currency: 'aed',
          items: items,
          customerId:_customerId
      );

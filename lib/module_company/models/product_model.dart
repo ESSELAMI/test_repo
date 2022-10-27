@@ -11,7 +11,8 @@ class ProductModel {
   late final imageUrl;
   late  int? orderQuantity;
   late bool  isRecommended;
-
+  ///This is the verify that the product is currently available (default is true)
+  bool isExist = true;
   ProductModel(
       {required this.id,
       required this.title,
@@ -34,9 +35,9 @@ class ProductModel {
     this.price = 1.0 * map['price'];
     this.old_price = map['old_price'] == null? null: 1.0 * map['old_price'];
     this.quantity = map['quantity'];
-    this.orderQuantity = map['order_quantity'];
-    this.imageUrl = map['imageUrl'];
-    this.isRecommended = map['isRecommended']==null? false:true;
+     this.orderQuantity = map['order_quantity'];
+     this.imageUrl = map['imageUrl'];
+     this.isRecommended = map['isRecommended'] ;
   }
 
   Map<String, dynamic>? toJson() {

@@ -328,6 +328,7 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                       children: List.generate(
                           items.length,
                               (index){
+                               final TextEditingController _quantityController = TextEditingController();
                                 final AddRemoveProductQuantityBloc addRemoveBloc =AddRemoveProductQuantityBloc();
                          return  AnimationConfiguration.staggeredGrid(
                             position: index,
@@ -535,16 +536,28 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                                                         ),
                                                       ),
                                                     ),
-                                                    Text(
-                                                      items[index]
-                                                          .quantity
-                                                          .toString() +' '+ S.of(context)!.plot,
-                                                      style: TextStyle(
-                                                          color:
-                                                          Colors.black26,
-                                                          fontWeight:
-                                                          FontWeight.w700,
-                                                          fontSize:12),
+                                                    Container(
+                                                      padding: EdgeInsets.all(2.0),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(5.0),
+                                                        border: Border.all()
+                                                      ),
+                                                      child: Text(
+                                                        items[index]
+                                                            .quantity
+                                                            .toString() +' '+ S.of(context)!.plot,
+
+                                                        style: TextStyle(
+
+                                                            color:
+                                                            Colors.black54,
+                                                            fontWeight:
+                                                            FontWeight.w700,
+                                                            fontSize:12.0,
+
+                                                        ),
+
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -552,12 +565,12 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                                             ),
                                             ///
                                             SizedBox(
-                                              height:8,
+                                              height:8.0,
                                             ),
                                             AspectRatio(
                                               aspectRatio: 6.5,
                                               child: Container(
-                                                 margin: EdgeInsets.symmetric(horizontal: 4),
+                                                 margin: EdgeInsets.symmetric(horizontal: 4.0),
                                                  // height: 30,
                                                  child: Row(
                                                    mainAxisAlignment:
@@ -601,57 +614,102 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                                                                    MainAxisAlignment
                                                                        .spaceBetween,
                                                                    children: [
-                                                                     Container(
-                                                                       alignment: Alignment.center,
-                                                                       color: ColorsConst
-                                                                           .mainColor,
-                                                                       width: w /
-                                                                           3,
-                                                                       child: Center(
-                                                                         child: IconButton(
-                                                                             onPressed: () {
-                                                                               addRemoveBloc.removeOne();
-                                                                             },
-                                                                             icon: Icon(
-                                                                               Icons.remove,
-                                                                               size:15,
-                                                                               color:
-                                                                               Colors.white,
-                                                                             )),
-                                                                       ),
-                                                                     ),
+                                                                     // Container(
+                                                                     //   alignment: Alignment.center,
+                                                                     //   color: ColorsConst
+                                                                     //       .mainColor,
+                                                                     //   width: w /
+                                                                     //       3,
+                                                                     //   child: Center(
+                                                                     //     child: IconButton(
+                                                                     //         onPressed: () {
+                                                                     //
+                                                                     //           addRemoveBloc.removeOne();
+                                                                     //         },
+                                                                     //         icon: Icon(
+                                                                     //           Icons.remove,
+                                                                     //           size:15,
+                                                                     //           color:
+                                                                     //           Colors.white,
+                                                                     //         )),
+                                                                     //   ),
+                                                                     // ),
                                                                      BlocBuilder<AddRemoveProductQuantityBloc , int>(
                                                                          bloc:addRemoveBloc ,
                                                                          builder: (context,state){
-                                                                           return  Container(
-                                                                             child: Text( state.toString(),style: TextStyle(fontWeight: FontWeight.w500,fontSize: 12.0),),
+                                                                           print(state);
+                                                                          return  Expanded(
+                                                                             child: SizedBox(
+                                                                               child: TextField(
+
+                                                                                 controller: _quantityController,
+                                                                                 textAlign: TextAlign.center,
+                                                                                 keyboardType: TextInputType.number,
+                                                                                onChanged:(value){
+                                                                                  addRemoveBloc.addProducts( int.parse(value));
+
+                                                                                } ,
+                                                                                 style: TextStyle(
+                                                                                     fontSize: 13),
+                                                                                 decoration:
+                                                                                 InputDecoration(
+                                                                                   contentPadding: EdgeInsets.symmetric(vertical: 4.0,horizontal: 8.0),
+                                                                                   border: UnderlineInputBorder(
+                                                                                     borderSide: BorderSide(
+                                                                                       color: Colors.black45
+                                                                                     ),
+
+                                                                                   ),
+                                                                                     label: Text(UtilsConst.lang=='en'?'quantity':'الكمية'),
+                                                                                     labelStyle: TextStyle(
+                                                                                       fontSize: 12.0,
+                                                                                         color: Colors.black45
+                                                                                     ),
+                                                                                     focusedBorder:  OutlineInputBorder(
+                                                                                       borderSide: BorderSide(
+                                                                                           color: Colors.blue
+                                                                                       ),
+
+                                                                                     ),
+                                                                                     isDense: true,
+                                                                                   hintText: '0',
+                                                                                   hintStyle: TextStyle(color: Colors.black54)
+                                                                                   ),
+                                                                               ),
+                                                                             ),
+                                                                           );
+                                                                           return  SizedBox(
+                                                                             child: TextField(
+
+                                                                             ),
+                                                                             //child: Text( state.toString(),style: TextStyle(fontWeight: FontWeight.w500,fontSize: 12.0),),
                                                                            );
                                                                          }),
-                                                                     Container(
-                                                                       alignment: Alignment.center,
-
-                                                                       width: w /
-                                                                           3,
-                                                                       color: ColorsConst
-                                                                           .mainColor,
-                                                                       child:
-                                                                       Center(
-                                                                         child: Center(
-                                                                           child: IconButton(
-                                                                               onPressed: () {
-                                                                                 addRemoveBloc.addOne();
-
-                                                                               },
-                                                                               icon: Icon(
-                                                                                 Icons.add,
-
-                                                                                 size:15,
-
-                                                                                 color: Colors.white,
-                                                                               )),
-                                                                         ),
-                                                                       ),
-                                                                     ),
+                                                                     // Container(
+                                                                     //   alignment: Alignment.center,
+                                                                     //
+                                                                     //   width: w /
+                                                                     //       3,
+                                                                     //   color: ColorsConst
+                                                                     //       .mainColor,
+                                                                     //   child:
+                                                                     //   Center(
+                                                                     //     child: Center(
+                                                                     //       child: IconButton(
+                                                                     //           onPressed: () {
+                                                                     //            // addRemoveBloc.addOne();
+                                                                     //
+                                                                     //           },
+                                                                     //           icon: Icon(
+                                                                     //             Icons.add,
+                                                                     //
+                                                                     //             size:15,
+                                                                     //
+                                                                     //             color: Colors.white,
+                                                                     //           )),
+                                                                     //     ),
+                                                                     //   ),
+                                                                     // ),
                                                                    ],
                                                                  ),
                                                                ],
@@ -666,7 +724,6 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
 
                                                        child: ElevatedButton
                                                            .icon(
-
                                                          onPressed: () {
                                                            widget._authService.isLoggedIn.then((value) {
                                                              if(value){
@@ -682,6 +739,7 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                                                                else{
                                                                  shopCartBloc.addProductsToCart(items[index],addRemoveBloc.state).then((value) {
                                                                    addRemoveBloc.clear();
+                                                                   _quantityController.clear();
                                                                  });
                                                                }
 

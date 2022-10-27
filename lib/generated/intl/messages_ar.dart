@@ -22,6 +22,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dontHaveAnAccount": MessageLookupByLibrary.simpleMessage("لا تملك حساب؟"),
     "emailAddressIsRequired": MessageLookupByLibrary.simpleMessage("الايميل مطلوب"),
     "passwordIsRequired": MessageLookupByLibrary.simpleMessage("كلمة السر مطلوبة"),
+    "invalidPhoneMessage": MessageLookupByLibrary.simpleMessage("رقم هاتف غير صحيح"),
 
     /// Register Page
 
@@ -204,6 +205,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "payByCard": MessageLookupByLibrary.simpleMessage("دفع اونلاين"),
     "addCard": MessageLookupByLibrary.simpleMessage("أضف بطاقة"),
     "selectCardAlert": MessageLookupByLibrary.simpleMessage("رجاءا حدد بطاقة الدفع "),
+    "productNotAvailable": MessageLookupByLibrary.simpleMessage("هذا المنتج غير متاح! ، قم بحذفه للمتابعة"),
+
 
     /// Products Pages
 

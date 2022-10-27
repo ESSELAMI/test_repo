@@ -88,6 +88,26 @@ class S {
     );
   }
 
+  /// `Product Not Available`
+  String get productNotAvailable {
+    return Intl.message(
+      'Product Not Available',
+      name: 'productNotAvailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid Phone Message `
+  String get invalidPhoneMessage {
+    return Intl.message(
+      'Invalid Phone Message',
+      name: 'invalidPhoneMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Welcome `
   String get welcome {
     return Intl.message(

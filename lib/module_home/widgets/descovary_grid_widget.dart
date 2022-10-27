@@ -64,15 +64,27 @@ class DescoveryGridWidget extends StatelessWidget {
 
                                 ) ,
                                 content:Container(
-                                  height: 50,
-                                  width: 60,
+                                  height: 60,
+
                                   child: Center(
                                     child:
-                                    Text(S.of(context)!.serviceComingSoon,
-                                      style: GoogleFonts.acme(
-                                          color: Colors.green,
-                                          fontWeight: FontWeight.bold
-                                      ),
+                                    Column(
+                                      children: [
+                                        Text(      UtilsConst.lang == 'en'?
+                                        data[index].name:
+                                        data[index].name2,
+                                          style: GoogleFonts.acme(
+                                              color: Colors.black45,
+                                              fontWeight: FontWeight.bold
+                                          ),),
+                                        SizedBox(height: 8.0,),
+                                        Text(S.of(context)!.serviceComingSoon,
+                                          style: GoogleFonts.acme(
+                                              color: Colors.green,
+                                              fontWeight: FontWeight.bold
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -181,10 +193,10 @@ class DescoveryGridWidget extends StatelessWidget {
                                   children: [
                                   Image.asset('assets/coming-soon-clock.png',height: SizeConfig.imageSize * 9,color: ColorsConst.mainColor.withOpacity(0.9),),
                                     SizedBox(height: 8,),
-                                    Text('Coming Soon',style: GoogleFonts.acme(
+                                    Text(S.of(context)!.serviceComingSoon,style: GoogleFonts.acme(
                                     color: ColorsConst.mainColor,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 12
+                                    fontSize: 11.5
                                   ),),
                                 ],),
                               )),
