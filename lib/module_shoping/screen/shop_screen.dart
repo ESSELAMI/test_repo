@@ -56,7 +56,7 @@ class _ShopScreenState extends State<ShopScreen> {
   late final _pageController;
 
   /// new order state management
-  final NewOrderBloc _orderBloc = NewOrderBloc(OrdersService());
+  late final NewOrderBloc _orderBloc ;
 
   /// controller to change the delivery address
   late final TextEditingController _newAddressController;
@@ -107,19 +107,19 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   void initState() {
 
+    _orderBloc = NewOrderBloc(OrdersService());
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if((ModalRoute.of(context)!.settings.arguments)!= null){
-        CartArguments cartArguments =  (ModalRoute.of(context)!.settings.arguments) as CartArguments;
+      if ((ModalRoute.of(context)!.settings.arguments) != null) {
+        CartArguments cartArguments =
+            (ModalRoute.of(context)!.settings.arguments) as CartArguments;
         addressModel = cartArguments.addressModel;
         _newAddressController.text = addressModel.description;
         _buildingAndHomeNumberController.text = cartArguments.buildingId;
         _phoneController.text = cartArguments.phone;
         vipOrder = cartArguments.vip;
         _noteController.text = cartArguments.note;
-        setState((){});
-
-      }else{
-
+        setState(() {});
+      } else {
         _authPrefsHelper.getAddress().then((value) {
           if (value != null) {
             addressModel = value;
@@ -127,15 +127,10 @@ class _ShopScreenState extends State<ShopScreen> {
           }
         });
 
-
         _authPrefsHelper.getPhone().then((value) {
           _phoneController.text = value!;
         });
-
       }
-
-
-
     });
     _newAddressController = TextEditingController(text: '');
     isLogginCubit = IsLogginCubit();
@@ -162,6 +157,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
   @override
   void dispose() {
+    _orderBloc.close();
     _pageController.dispose();
     isLogginCubit.close();
     super.dispose();
@@ -294,11 +290,11 @@ class _ShopScreenState extends State<ShopScreen> {
                               color: Colors.black,
                             ),
                             onPressed: () {
-                              if (Navigator.canPop(context)){
-                                if( currentIndex == 0){
+                              if (Navigator.canPop(context)) {
+                                if (currentIndex == 0) {
                                   Navigator.pop(context);
-                                }else{
-                                  currentIndex -- ;
+                                } else {
+                                  currentIndex--;
                                   _pageController.animateToPage(
                                     currentIndex,
                                     duration: const Duration(milliseconds: 100),
@@ -446,22 +442,30 @@ class _ShopScreenState extends State<ShopScreen> {
         });
   }
 
-
-  void _removeProductFromUi(int index,ProductModel removedProduct){
-    productListShopKey.currentState!.removeItem(index, (context, animation) =>
-        _buildShoppingCard(productModel: removedProduct, quantity: removedProduct.orderQuantity == null?0:removedProduct.orderQuantity!, animation: animation,index: index),
-    duration: Duration(milliseconds: 300)
-    );
+  void _removeProductFromUi(int index, ProductModel removedProduct) {
+    productListShopKey.currentState!.removeItem(
+        index,
+        (context, animation) => _buildShoppingCard(
+            productModel: removedProduct,
+            quantity: removedProduct.orderQuantity == null
+                ? 0
+                : removedProduct.orderQuantity!,
+            animation: animation,
+            index: index),
+        duration: Duration(milliseconds: 300));
   }
 
   Widget _buildShoppingCard(
-      {required ProductModel productModel, required int quantity,required Animation<double> animation,required int index}) {
-
+      {required ProductModel productModel,
+      required int quantity,
+      required Animation<double> animation,
+      required int index}) {
     bool _isExist = productModel.isExist;
 
     return SlideTransition(
       key: ValueKey(productModel.imageUrl),
-      position: Tween<Offset>(begin: Offset(-1,0),end: Offset.zero).animate(CurvedAnimation(parent: animation, curve: Curves.linear)),
+      position: Tween<Offset>(begin: Offset(-1, 0), end: Offset.zero)
+          .animate(CurvedAnimation(parent: animation, curve: Curves.linear)),
       child: Stack(
         children: [
           Container(
@@ -473,7 +477,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 Container(
                   width: 10.0,
                   decoration: BoxDecoration(
-                      color: _isExist?ColorsConst.mainColor:Colors.red,
+                      color: _isExist ? ColorsConst.mainColor : Colors.red,
                       borderRadius: UtilsConst.lang == 'en'
                           ? BorderRadius.only(
                               topLeft: Radius.circular(20),
@@ -489,18 +493,16 @@ class _ShopScreenState extends State<ShopScreen> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: Colors.white,
-
                         boxShadow: [
-                          _isExist?
-                          BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 2.0,
-                              offset: Offset(0, 2)):
-                          BoxShadow(
-                              color: Colors.red,
-                              blurRadius: 1.0,
-                              offset: Offset(0, 1))
-
+                          _isExist
+                              ? BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 2.0,
+                                  offset: Offset(0, 2))
+                              : BoxShadow(
+                                  color: Colors.red,
+                                  blurRadius: 1.0,
+                                  offset: Offset(0, 1))
                         ],
                       ),
                       child: LayoutBuilder(
@@ -516,7 +518,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                 child: CachedNetworkImage(
                                   imageUrl: productModel.imageUrl,
                                   progressIndicatorBuilder: (context, l, ll) =>
-                                   Center(
+                                      Center(
                                     child: Container(
                                       height: 30.0,
                                       width: 30.0,
@@ -537,7 +539,8 @@ class _ShopScreenState extends State<ShopScreen> {
                               Container(
                                 width: w / 2.3,
                                 child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -596,19 +599,25 @@ class _ShopScreenState extends State<ShopScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Container(
-                                              color:_isExist? ColorsConst.mainColor:Colors.black45,
-                                              width: SizeConfig.widhtMulti * 8.0,
+                                              color: _isExist
+                                                  ? ColorsConst.mainColor
+                                                  : Colors.black45,
+                                              width:
+                                                  SizeConfig.widhtMulti * 8.0,
                                               child: IconButton(
                                                   onPressed: () {
-                                                    if(_isExist){
+                                                    if (_isExist) {
                                                       shopCartBloc
                                                           .removeProductFromCart(
-                                                          productModel);
-                                                    }else{
-                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context)!.productNotAvailable)));
+                                                              productModel);
+                                                    } else {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(SnackBar(
+                                                              content: Text(S
+                                                                  .of(context)!
+                                                                  .productNotAvailable)));
                                                     }
-
-
                                                   },
                                                   icon: Icon(
                                                     Icons.remove,
@@ -620,19 +629,27 @@ class _ShopScreenState extends State<ShopScreen> {
                                               child: Text(quantity.toString()),
                                             ),
                                             Container(
-                                              width: SizeConfig.widhtMulti * 8.0,
+                                              width:
+                                                  SizeConfig.widhtMulti * 8.0,
                                               alignment: Alignment.center,
-                                              color:_isExist? ColorsConst.mainColor:Colors.black45,                                              child: Center(
+                                              color: _isExist
+                                                  ? ColorsConst.mainColor
+                                                  : Colors.black45,
+                                              child: Center(
                                                 child: IconButton(
                                                     onPressed: () {
-                                                      if(_isExist){
+                                                      if (_isExist) {
                                                         shopCartBloc
                                                             .addProductToCart(
-                                                            productModel);
-                                                      }else{
-                                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context)!.productNotAvailable)));
+                                                                productModel);
+                                                      } else {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(SnackBar(
+                                                                content: Text(S
+                                                                    .of(context)!
+                                                                    .productNotAvailable)));
                                                       }
-
                                                     },
                                                     icon: Icon(
                                                       Icons.add,
@@ -664,17 +681,17 @@ class _ShopScreenState extends State<ShopScreen> {
                     height: 28.0,
                     margin: EdgeInsets.symmetric(horizontal: 6.0),
                     clipBehavior: Clip.antiAlias,
-                    decoration:
-                        BoxDecoration(shape: BoxShape.circle, color: Colors.red),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle, color: Colors.red),
                     child: Center(
                       child: SizedBox(
                         height: 28.0,
                         width: 28.0,
                         child: IconButton(
                           onPressed: () {
-                            shopCartBloc
-                                .removeFullQuantityProductFromCart(productModel);
-                            _removeProductFromUi(index,productModel);
+                            shopCartBloc.removeFullQuantityProductFromCart(
+                                productModel);
+                            _removeProductFromUi(index, productModel);
                           },
                           icon: Icon(
                             Icons.clear,
@@ -692,17 +709,17 @@ class _ShopScreenState extends State<ShopScreen> {
                     height: 28.0,
                     margin: EdgeInsets.symmetric(horizontal: 6.0),
                     clipBehavior: Clip.antiAlias,
-                    decoration:
-                        BoxDecoration(shape: BoxShape.circle, color: Colors.red),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle, color: Colors.red),
                     child: Center(
                       child: SizedBox(
                         height: 28.0,
                         width: 28.0,
                         child: IconButton(
                           onPressed: () {
-                            shopCartBloc
-                                .removeFullQuantityProductFromCart(productModel);
-                            _removeProductFromUi(index,productModel);
+                            shopCartBloc.removeFullQuantityProductFromCart(
+                                productModel);
+                            _removeProductFromUi(index, productModel);
                           },
                           icon: Icon(
                             Icons.clear,
@@ -729,10 +746,11 @@ class _ShopScreenState extends State<ShopScreen> {
               bloc: shopCartBloc,
               builder: (context, state) {
                 if (state is CartLoading) {
-                  return Center(child: Container(
-                      width: 25.0,
-                      height: 25.0,
-                      child: CircularProgressIndicator()));
+                  return Center(
+                      child: Container(
+                          width: 25.0,
+                          height: 25.0,
+                          child: CircularProgressIndicator()));
                 } else if (state is CartLoaded) {
                   requestProduct = state.cart.products;
                   if (requestProduct.isEmpty) {
@@ -754,11 +772,15 @@ class _ShopScreenState extends State<ShopScreen> {
                       ],
                     ));
                   } else
-                    return AnimatedList(
-                      key: productListShopKey,
-                      initialItemCount:  state.cart.productQuantity(state.cart.products).keys.length,
-                          itemBuilder: (context, index,animate) {
-                             return _buildShoppingCard(
+                    return Scrollbar(
+                      child: AnimatedList(
+                          key: productListShopKey,
+                          initialItemCount: state.cart
+                              .productQuantity(state.cart.products)
+                              .keys
+                              .length,
+                          itemBuilder: (context, index, animate) {
+                            return _buildShoppingCard(
                                 productModel: state.cart
                                     .productQuantity(state.cart.products)
                                     .keys
@@ -767,33 +789,16 @@ class _ShopScreenState extends State<ShopScreen> {
                                     .productQuantity(state.cart.products)
                                     .values
                                     .elementAt(index),
-                             animation: animate,
-                               index: index
-                             );
-                          }
+                                animation: animate,
+                                index: index);
+                          }),
                     );
-                    // return ListView.builder(
-                    //     shrinkWrap: true,
-                    //     itemCount: state.cart
-                    //         .productQuantity(state.cart.products)
-                    //         .keys
-                    //         .length,
-                    //     itemBuilder: (context, index) {
-                    //       return _buildShoppingCard(
-                    //           productModel: state.cart
-                    //               .productQuantity(state.cart.products)
-                    //               .keys
-                    //               .elementAt(index),
-                    //           quantity: state.cart
-                    //               .productQuantity(state.cart.products)
-                    //               .values
-                    //               .elementAt(index));
-                    //     });
-
                 } else {
                   return Container(
                       child: Center(
-                    child: Text(UtilsConst.lang =='en'?'An Error Occurred':'حدث خطا'),
+                    child: Text(UtilsConst.lang == 'en'
+                        ? 'An Error Occurred'
+                        : 'حدث خطا'),
                   ));
                 }
               }),
@@ -918,10 +923,27 @@ class _ShopScreenState extends State<ShopScreen> {
                       borderRadius: BorderRadius.circular(10)),
                   child: MaterialButton(
                     onPressed: () {
+                      bool _canNext = true;
+                      if (shopCartBloc.state is CartLoaded) {
+                        (shopCartBloc.state as CartLoaded).cart.products.forEach((element) {
+                          if(!element.isExist){
+                            _canNext = false;
+                          }
+                        });
 
-                      _pageController.nextPage(
-                          duration: Duration(milliseconds: 200),
-                          curve: Curves.ease);
+                        if(_canNext){
+                          _pageController.nextPage(
+                              duration: Duration(milliseconds: 200),
+                              curve: Curves.ease);
+                        }
+
+                        else{
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content:
+                              Text(S.of(context)!.removeItemsTheAreMissing)));
+                        }
+                      }
+
                     },
                     child: Text(
                       S.of(context)!.next,
@@ -960,7 +982,7 @@ class _ShopScreenState extends State<ShopScreen> {
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 8),
                 padding: EdgeInsets.all(8),
-                height: 160,
+                height: 160.0,
                 width: double.maxFinite,
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -1117,14 +1139,6 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                             () {
                                                                           addressModel =
                                                                               data[index].address;
-                                                                          print(
-                                                                              '7777777777777');
-                                                                          print(data[index]
-                                                                              .address
-                                                                              .latitude);
-                                                                          print(data[index]
-                                                                              .address
-                                                                              .longitude);
 
                                                                           _newAddressController.text =
                                                                               data[index].display;
@@ -1390,12 +1404,13 @@ class _ShopScreenState extends State<ShopScreen> {
                                   fontSize: 11.0),
                             ),
                             SizedBox(
-                              width: 10,
+                              width: 10.0,
                             ),
                             Expanded(
                               child: TextField(
                                 controller: _buildingAndHomeNumberController,
-                                cursorHeight: 15,
+                                cursorHeight: 15.0,
+
                                 style: TextStyle(
                                     fontSize: 12.0,
                                     fontWeight: FontWeight.bold,
@@ -1407,7 +1422,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                 decoration: InputDecoration(
                                     isDense: true,
                                     contentPadding:
-                                        EdgeInsets.symmetric(vertical: 4),
+                                        EdgeInsets.symmetric(vertical: 4.0),
                                     suffixIcon: Icon(
                                       Icons.edit,
                                       color: _buildingAndHomeNumberController
@@ -2127,9 +2142,10 @@ class _ShopScreenState extends State<ShopScreen> {
                             duration: Duration(milliseconds: 200),
                             curve: Curves.ease);
                       } else
-                        _scaffoldState.currentState!.showSnackBar(SnackBar(
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content:
-                                Text(S.of(context)!.requiredCartFieldMessage)));
+                            Text(S.of(context)!.requiredCartFieldMessage)));
+
                       // }
                     },
                     child: Text(
@@ -2165,7 +2181,7 @@ class _ShopScreenState extends State<ShopScreen> {
               /// Payment Summary
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 8),
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.all(8.0),
                 height: 130.0,
                 width: double.maxFinite,
                 decoration: BoxDecoration(
@@ -2193,8 +2209,8 @@ class _ShopScreenState extends State<ShopScreen> {
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.blue, width: 2)),
                           child: Container(
-                            height: 25.0,
-                            width: 25.0,
+                            height: 20.0,
+                            width: 20.0,
                             margin: EdgeInsets.all(2),
                             clipBehavior: Clip.antiAlias,
                             decoration: BoxDecoration(
@@ -2643,8 +2659,9 @@ class _ShopScreenState extends State<ShopScreen> {
                               });
                             } else if (state is CreateOrderErrorState) {
                               hideLoadingDialog();
-                              snackBarSuccessWidget(
-                                  context, S.of(context)!.orderWasNotAdded);
+
+                              /// The message is from the service layer (customize message)
+                              snackBarSuccessWidget(context, state.message);
                             } else if (state is CreateOrderLoadingState) {
                               showCustomLoadingWidget(
                                 Center(
@@ -2654,8 +2671,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Container(
-                                          width: 40,
-                                          height: 40,
+                                          width: 40.0,
+                                          height: 40.0,
                                           color: Colors.transparent,
                                           child: Platform.isIOS
                                               ? CupertinoActivityIndicator(
@@ -2667,7 +2684,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                                 ),
                                         ),
                                         Container(
-                                          height: 10,
+                                          height: 10.0,
                                         ),
                                       ],
                                     ),
@@ -2682,9 +2699,10 @@ class _ShopScreenState extends State<ShopScreen> {
                             return AnimatedContainer(
                               duration: Duration(milliseconds: 200),
                               clipBehavior: Clip.antiAlias,
-                              height: 35,
-                              width:
-                                  isLoading ? 60 : SizeConfig.screenWidth * 0.8,
+                              height: 35.0,
+                              width: isLoading
+                                  ? 60.0
+                                  : SizeConfig.screenWidth * 0.8,
                               padding: EdgeInsets.all(isLoading ? 8 : 0),
                               margin: EdgeInsets.symmetric(horizontal: 20),
                               decoration: BoxDecoration(
@@ -2693,8 +2711,8 @@ class _ShopScreenState extends State<ShopScreen> {
                               child: isLoading
                                   ? Center(
                                       child: Container(
-                                      height: 20,
-                                      width: 20,
+                                      height: 20.0,
+                                      width: 20.0,
                                       child: Platform.isIOS
                                           ? CupertinoActivityIndicator(
                                               color: Colors.white,
@@ -2706,20 +2724,20 @@ class _ShopScreenState extends State<ShopScreen> {
                                   : MaterialButton(
                                       onPressed: () async {
                                         if (orderNotComplete) {
-                                          _scaffoldState.currentState!
+                                          ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                                   content: Text(S
                                                       .of(context)!
                                                       .completeTheOrder)));
                                         } else if (!(_checkAddressBloc.state
                                             is CheckAddressSuccessState)) {
-                                          _scaffoldState.currentState!
+                                          ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                                   content: Text(S
                                                       .of(context)!
                                                       .destinationAlert)));
                                         } else if (paymentGroupValue == '') {
-                                          _scaffoldState.currentState!
+                                          ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                                   content: Text(S
                                                       .of(context)!
@@ -2756,10 +2774,10 @@ class _ShopScreenState extends State<ShopScreen> {
                                                       BorderRadius.only(
                                                           topLeft:
                                                               Radius.circular(
-                                                                  30),
+                                                                  30.0),
                                                           topRight:
                                                               Radius.circular(
-                                                                  30)),
+                                                                  30.0)),
                                                 ),
                                                 child: Column(
                                                   crossAxisAlignment:
@@ -2772,7 +2790,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                                         },
                                                         icon: Icon(
                                                           Icons.clear,
-                                                          size: 20,
+                                                          size: 20.0,
                                                         )),
                                                     Padding(
                                                       padding: const EdgeInsets
@@ -3072,8 +3090,8 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                                     child: Padding(
                                                                                   padding: EdgeInsets.symmetric(horizontal: 8),
                                                                                   child: Text(
-                                                                                    'Important: The application dose not save the card data',
-                                                                                    style: TextStyle(color: Colors.black45, fontSize: 11.0, decoration: TextDecoration.underline),
+                                                                                    S.of(context)!.importantCreditCardsMessage,
+                                                                                    style: TextStyle(color: Colors.black54, fontSize: 13.0, decoration: TextDecoration.underline),
                                                                                   ),
                                                                                 )),
                                                                               ],
@@ -3253,7 +3271,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w800,
-                                            fontSize: 14),
+                                            fontSize: 14.0),
                                       ),
                                     ),
                             );

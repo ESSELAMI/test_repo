@@ -43,8 +43,7 @@ class NewOrderBloc extends Bloc<CreateOrderEvent,CreateOrderStates> {
   }) {
     this.add(CreateOrderLoadingEvent());
     _service
-        .addNewOrder(orderSource:null,note:note, storeId: storeId, productsIds: null,customerOrderID: null, products: product, addressName: addressName,deliveryTimes: deliveryTimes, numberOfMonth: numberOfMonth,orderType: orderType, destination: destination, phoneNumber: phoneNumber, paymentMethod: paymentMethod, amount: orderValue, cardId: cardId,
-    reorder: false,description: null,arDescription: null,buildingHomeId:buildingHomeId)
+        .addNewOrder(orderSource:null,note:note, storeId: storeId, productsIds: null,customerOrderID: null, products: product, addressName: addressName,deliveryTimes: deliveryTimes, numberOfMonth: numberOfMonth,orderType: orderType, destination: destination, phoneNumber: phoneNumber, paymentMethod: paymentMethod, amount: orderValue, cardId: cardId, description: null,arDescription: null,buildingHomeId:buildingHomeId)
         .then((response) {
           if(response.order != null){
             this.add(CreateOrderSuccessEvent(data: response.order!));
@@ -54,19 +53,19 @@ class NewOrderBloc extends Bloc<CreateOrderEvent,CreateOrderStates> {
       }
     );
   }
-  reorder(String orderID){
-    this.add(CreateOrderLoadingEvent());
-    _service
-        .reorder(orderID)
-        .then((response) {
-      if(response.order == null){
-        this.add(CreateOrderSuccessEvent(data:response.order! ));
-      }else{
-        this.add(CreateOrderErrorEvent(message: response.message));
-      }
-    }
-    );
-  }
+  // reorder(String orderID){
+  //   this.add(CreateOrderLoadingEvent());
+  //   _service
+  //       .reorder(orderID)
+  //       .then((response) {
+  //     if(response.order == null){
+  //       this.add(CreateOrderSuccessEvent(data:response.order! ));
+  //     }else{
+  //       this.add(CreateOrderErrorEvent(message: response.message));
+  //     }
+  //   }
+  //   );
+  // }
 }
 
 

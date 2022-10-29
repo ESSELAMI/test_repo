@@ -154,15 +154,16 @@ class OrderRepository {
       batch.delete(mainOrderRef);
 
       /// remove More Detail
-      var moreOrderRef = _firestore.collection('orders').doc(mainOrderRef.id).collection('details').doc();
+     var _detailsDocRef =await _firestore.collection('orders').doc(mainOrderRef.id).collection('details').get().then((value) {
+        return value.docs[0].id;
+       });
+
+      var moreOrderRef = _firestore.collection('orders').doc(mainOrderRef.id).collection('details').doc(_detailsDocRef);
       batch.delete(moreOrderRef);
       /// Commit the batch
 
      await batch.commit().then((_) {
-        print('Data Success Commit !!!!!!');
       }).catchError((e){
-        print('43434343433333333333');
-        print(e.toString());
         throw Exception();
       });
 
@@ -233,7 +234,7 @@ class OrderRepository {
 
     // product not found (deleted)
     if(!_ref.exists){
-      throw OrderException('Product Not Found');
+      throw ProductOrderIsNotExist('Product Not Found');
     }
     // product is exist
     else{

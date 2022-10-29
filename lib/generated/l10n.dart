@@ -88,6 +88,24 @@ class S {
     );
   }
 
+  /// `continue by google`
+  String get continueByGoogle {
+    return Intl.message(
+      'continue by google',
+      name: 'continueByGoogle',
+      desc: '',
+      args: [],
+    );
+  }
+  /// `continue by apple`
+  String get continueByApple {
+    return Intl.message(
+      'Sign In To Continue',
+      name: 'continueByApple',
+      desc: '',
+      args: [],
+    );
+  }
   /// `Product Not Available`
   String get productNotAvailable {
     return Intl.message(
@@ -408,6 +426,35 @@ class S {
     );
   }
 
+  /// `Cancel Order Successfully Message`
+  String get cancelOrderSuccessfullyMessage{
+    return Intl.message(
+      'Cancel Order Successfully Message',
+      name: 'cancelOrderSuccessfullyMessage',
+      desc: '',
+      args: [],
+    );
+  }
+  /// `Important Credit Cards Message`
+  String get importantCreditCardsMessage{
+    return Intl.message(
+      'Important Credit Cards Message',
+      name: 'importantCreditCardsMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel Order Error Message`
+  String get cancelOrderErrorMessage{
+    return Intl.message(
+      'Cancel Order Error Message',
+      name: 'cancelOrderErrorMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Sub Title Page Three`
   String get subTitlePageThree {
     return Intl.message(
@@ -503,7 +550,7 @@ class S {
   }
 
   /// `Pcs`
-  String get plot {
+  String get pcs {
     return Intl.message(
       'Pcs',
       name: 'pcs',
@@ -1359,6 +1406,46 @@ class S {
     return Intl.message(
       'Required Cart Field Message',
       name: 'requiredCartFieldMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove Items The Are Missing`
+  String get removeItemsTheAreMissing {
+    return Intl.message(
+      'Remove Items The Are Missing',
+      name: 'removeItemsTheAreMissing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel Order`
+  String get cancelOrder {
+    return Intl.message(
+      'Cancel Order',
+      name: 'cancelOrder',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Title Message Cancel Order`
+  String get titleMessageCancelOrder {
+    return Intl.message(
+      'Title Message Cancel Order',
+      name: 'titleMessageCancelOrder',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sub Title Message Cancel Order`
+  String get subTitleMessageCancelOrder {
+    return Intl.message(
+      'Sub Title Message Cancel Order',
+      name: 'subTitleMessageCancelOrder',
       desc: '',
       args: [],
     );

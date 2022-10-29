@@ -71,11 +71,6 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    buildTypes {
-        release {
-            signingConfig signingConfigs.debug
-        }
-    }
 }
 
 flutter {

@@ -35,6 +35,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "emailAddressIsRequired": MessageLookupByLibrary.simpleMessage("ُmail address is required"),
     "passwordIsRequired": MessageLookupByLibrary.simpleMessage("Password is required"),
     "invalidPhoneMessage": MessageLookupByLibrary.simpleMessage("invalid phone number"),
+    "continueByGoogle": MessageLookupByLibrary.simpleMessage("Continue By Google"),
+    "continueByApple": MessageLookupByLibrary.simpleMessage("Continue By Apple"),
+
 
 
     /// Register Page
@@ -285,7 +288,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "signedOutSuccessfully": MessageLookupByLibrary.simpleMessage("Signed Out Successfully"),
     "nextTimeBookMark": MessageLookupByLibrary.simpleMessage("Add bookmarks for next time"),
     "cart": MessageLookupByLibrary.simpleMessage("Cart"),
-    "plot": MessageLookupByLibrary.simpleMessage("pcs"),
+    "pcs": MessageLookupByLibrary.simpleMessage("pcs"),
     "note": MessageLookupByLibrary.simpleMessage("Note"),
     "noteMessage": MessageLookupByLibrary.simpleMessage("This note will appear at the delivery service provider"),
     "validPhone": MessageLookupByLibrary.simpleMessage("Enter Valid Phone Number"),
@@ -294,6 +297,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "numberOfItemsRequired": MessageLookupByLibrary.simpleMessage("Select the number of items required"),
     "fetchOrdersDoneMessage": MessageLookupByLibrary.simpleMessage("All orders loaded"),
     "fetchOrdersErrorMessage": MessageLookupByLibrary.simpleMessage("There was an error loading items. Scroll down to refresh"),
+    "removeItemsTheAreMissing": MessageLookupByLibrary.simpleMessage("Remove items the are missing"),
+    "cancelOrder": MessageLookupByLibrary.simpleMessage("Cancel Order"),
+    "titleMessageCancelOrder": MessageLookupByLibrary.simpleMessage("Do you want to delete this order ?"),
+    "subTitleMessageCancelOrder": MessageLookupByLibrary.simpleMessage("Note: When you delete the order, you cannot get it again, which means it will not be archived ."),
+    "cancelOrderErrorMessage": MessageLookupByLibrary.simpleMessage("An Error Occurred , try again !"),
+    "cancelOrderSuccessfullyMessage": MessageLookupByLibrary.simpleMessage("The order was successfully cancelled !"),
+    "importantCreditCardsMessage": MessageLookupByLibrary.simpleMessage("Important: The application dose not save the card data"),
+
+
+
+
 
 
 

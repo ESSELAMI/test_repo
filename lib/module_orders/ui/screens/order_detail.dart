@@ -470,7 +470,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             cancelOrderAlertWidget(context,_detailBloc,orderID);
                           },
                           child: Center(
-                            child: Text('Cancel Order' , style: TextStyle(color: Colors.red,fontSize:18,fontWeight: FontWeight.bold),),
+                            child: Text(S.of(context)!.cancelOrder , style: TextStyle(color: Colors.red,fontSize:18,fontWeight: FontWeight.bold),),
                           ),
                         ),
                       ),
@@ -531,177 +531,179 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ),
             ),
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: GridView.count(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 15,
-                    childAspectRatio: 0.7,
-                    children: List.generate(
-                        items.length,
-                            (index){
-                          return  AnimationConfiguration.staggeredGrid(
-                            position: index,
-                            columnCount:3,
-                            duration: Duration(milliseconds: 350),
-                            child: ScaleAnimation(
-                                child: FadeInAnimation(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.pushNamed(context, CompanyRoutes.PRODUCTS_DETAIL_SCREEN,arguments:items[index].id );
-                                    },
-                                    child: Badge(
-                                      badgeContent: Container(
-                                        margin: EdgeInsets.symmetric(horizontal: 10),
-                                        height: 15,
-                                        width: 15,
-                                        child:
-                                        Center(
-                                          child: Text(items[index].orderQuantity.toString(),
-                                          style: TextStyle(color: Colors.white,
-                                          fontSize: 11,
-                                            fontWeight: FontWeight.w600
-                                          ),
+              child: Scrollbar(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal:20.0),
+                  child: GridView.count(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 15,
+                      mainAxisSpacing: 15,
+                      childAspectRatio: 0.7,
+                      children: List.generate(
+                          items.length,
+                              (index){
+                            return  AnimationConfiguration.staggeredGrid(
+                              position: index,
+                              columnCount:3,
+                              duration: Duration(milliseconds: 350),
+                              child: ScaleAnimation(
+                                  child: FadeInAnimation(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(context, CompanyRoutes.PRODUCTS_DETAIL_SCREEN,arguments:items[index].id );
+                                      },
+                                      child: Badge(
+                                        badgeContent: Container(
+                                          margin: EdgeInsets.symmetric(horizontal: 10),
+                                          height: 15,
+                                          width: 15,
+                                          child:
+                                          Center(
+                                            child: Text(items[index].orderQuantity.toString(),
+                                            style: TextStyle(color: Colors.white,
+                                            fontSize: 11,
+                                              fontWeight: FontWeight.w600
+                                            ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      child: Container(
-                                        clipBehavior: Clip.antiAlias,
-                                        decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(10),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: Colors.black12,
-                                                  blurRadius: 1,
-                                                  offset: Offset(0, 1))
-                                            ]),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            AspectRatio(
-                                              aspectRatio:  1.5,
-                                              child: Container(
-                                                child: Stack(
-                                                  children: [
-                                                    Container(
-                                                      width: double.infinity,
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                        BorderRadius.circular(10),
-                                                        // child: Image.network( items[index].imageUrl,
-                                                        //   fit: BoxFit.fitHeight,
-                                                        // )
-                                                        child:  CachedNetworkImage(
-                                                          imageUrl: items[index]
-                                                              .imageUrl,
-                                                          progressIndicatorBuilder:
-                                                              (context, l, ll) =>
-                                                              Center(
-                                                                child: Container(
-                                                                  height: 30,
-                                                                  width: 30,
-                                                                  child: CircularProgressIndicator(
-                                                                    value: ll.progress,
-                                                                    color: Colors.black12,
+                                        child: Container(
+                                          clipBehavior: Clip.antiAlias,
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.circular(10),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.black12,
+                                                    blurRadius: 1,
+                                                    offset: Offset(0, 1))
+                                              ]),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              AspectRatio(
+                                                aspectRatio:  1.5,
+                                                child: Container(
+                                                  child: Stack(
+                                                    children: [
+                                                      Container(
+                                                        width: double.infinity,
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                          BorderRadius.circular(10),
+                                                          // child: Image.network( items[index].imageUrl,
+                                                          //   fit: BoxFit.fitHeight,
+                                                          // )
+                                                          child:  CachedNetworkImage(
+                                                            imageUrl: items[index]
+                                                                .imageUrl,
+                                                            progressIndicatorBuilder:
+                                                                (context, l, ll) =>
+                                                                Center(
+                                                                  child: Container(
+                                                                    height: 30,
+                                                                    width: 30,
+                                                                    child: CircularProgressIndicator(
+                                                                      value: ll.progress,
+                                                                      color: Colors.black12,
+                                                                    ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                          errorWidget: (context,
-                                                              s, l) =>
-                                                              Center(child: Icon(Icons.error,size: 40,color: Colors.black45,)),
-                                                          fit: BoxFit.fitHeight,
-                                                        ),
-                                                      ),
-                                                    ),
-
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(height: 10,),
-                                            Expanded(
-                                              child: Padding(
-                                                padding: EdgeInsets.only(top: 8),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      color: Colors.white,
-                                                      child: Row(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        mainAxisAlignment: MainAxisAlignment.start,
-                                                        children: [
-                                                          // (items[index].old_price !=
-                                                          //     null)
-                                                          //     ? Text(
-                                                          //   '${items[index].old_price.toString()}  ${UtilsConst.lang == 'en'?'AED':'د.إ'}',
-                                                          //   overflow:
-                                                          //   TextOverflow
-                                                          //       .ellipsis,
-                                                          //   style: TextStyle(
-                                                          //       decoration:
-                                                          //       TextDecoration
-                                                          //           .lineThrough,
-                                                          //       color: Colors
-                                                          //           .black26,
-                                                          //       fontWeight:
-                                                          //       FontWeight
-                                                          //           .w700,
-                                                          //       fontSize:11),
-                                                          // )
-                                                          //     : SizedBox.shrink(),
-                                                          SizedBox(width: 8,),
-                                                          Expanded(
-                                                            child: Text(
-                                                              '${items[index].price.toString()}  ${UtilsConst.lang == 'en'?'AED':'د.إ'}',
-                                                              overflow: TextOverflow
-                                                                  .ellipsis,
-                                                              style: TextStyle(
-                                                                  color: Colors.green,
-                                                                  fontWeight:
-                                                                  FontWeight.w700,
-                                                                  fontSize:13),
-                                                            ),
+                                                            errorWidget: (context,
+                                                                s, l) =>
+                                                                Center(child: Icon(Icons.error,size: 40,color: Colors.black45,)),
+                                                            fit: BoxFit.fitHeight,
                                                           ),
-
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 6,),
-                                                    Expanded(
-                                                      child: Container(
-                                                        color: Colors.white,
-                                                        padding: EdgeInsets.symmetric(horizontal: 5),
-                                                        child: Text(
-                                                          UtilsConst.lang =='en'?
-                                                          items[index].title:
-                                                          items[index].title2
-                                                          ,
-                                                          maxLines: 2,
-                                                          style: TextStyle(
-                                                            color: Colors.black87,
-                                                              fontSize: 11,
-                                                              fontWeight:
-                                                              FontWeight.bold,
-                                                              overflow: TextOverflow.ellipsis),
                                                         ),
                                                       ),
-                                                    ),
-                                                    SizedBox(height: 5,),
 
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                              SizedBox(height: 10,),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(top: 8),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Container(
+                                                        color: Colors.white,
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          children: [
+                                                            // (items[index].old_price !=
+                                                            //     null)
+                                                            //     ? Text(
+                                                            //   '${items[index].old_price.toString()}  ${UtilsConst.lang == 'en'?'AED':'د.إ'}',
+                                                            //   overflow:
+                                                            //   TextOverflow
+                                                            //       .ellipsis,
+                                                            //   style: TextStyle(
+                                                            //       decoration:
+                                                            //       TextDecoration
+                                                            //           .lineThrough,
+                                                            //       color: Colors
+                                                            //           .black26,
+                                                            //       fontWeight:
+                                                            //       FontWeight
+                                                            //           .w700,
+                                                            //       fontSize:11),
+                                                            // )
+                                                            //     : SizedBox.shrink(),
+                                                            SizedBox(width: 8,),
+                                                            Expanded(
+                                                              child: Text(
+                                                                '${items[index].price.toString()}  ${UtilsConst.lang == 'en'?'AED':'د.إ'}',
+                                                                overflow: TextOverflow
+                                                                    .ellipsis,
+                                                                style: TextStyle(
+                                                                    color: Colors.green,
+                                                                    fontWeight:
+                                                                    FontWeight.w700,
+                                                                    fontSize:13),
+                                                              ),
+                                                            ),
+
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 6,),
+                                                      Expanded(
+                                                        child: Container(
+                                                          color: Colors.white,
+                                                          padding: EdgeInsets.symmetric(horizontal: 5),
+                                                          child: Text(
+                                                            UtilsConst.lang =='en'?
+                                                            items[index].title:
+                                                            items[index].title2
+                                                            ,
+                                                            maxLines: 2,
+                                                            style: TextStyle(
+                                                              color: Colors.black87,
+                                                                fontSize: 11,
+                                                                fontWeight:
+                                                                FontWeight.bold,
+                                                                overflow: TextOverflow.ellipsis),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 5,),
+
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                )),
-                          );})),
+                                  )),
+                            );})),
+                ),
               ),
             ),
           ],

@@ -245,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(
-                        height: 4,
+                        height: 4.0,
                       ),
                       Align(
                         alignment: UtilsConst.lang == 'en'
@@ -262,14 +262,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Container(
                             padding: UtilsConst.lang == 'en'
                                 ? EdgeInsets.only(
-                                    right: SizeConfig.widhtMulti * 4)
+                                    right: SizeConfig.widhtMulti * 4.0)
                                 : EdgeInsets.only(
-                                    left: SizeConfig.widhtMulti * 4),
+                                    left: SizeConfig.widhtMulti * 4.0),
                             child: Text(S.of(context)!.forgotPassword,
                                 style: GoogleFonts.lato(
                                   fontWeight: FontWeight.w800,
                                   color: Colors.black54,
-                                  fontSize: 12,
+                                  fontSize: 12.0,
                                 )),
                           ),
                         ),
@@ -297,14 +297,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           builder: (context, LoginStates state) {
                             return ListTile(
                               title: Container(
-                                height: 35,
-                                margin: EdgeInsets.symmetric(horizontal: 20),
+                                height: 35.0,
+                                margin: EdgeInsets.symmetric(horizontal: 20.0),
                                 clipBehavior: Clip.antiAlias,
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10)),
+                                    borderRadius: BorderRadius.circular(10.0)),
                                 child: ClipRRect(
                                   clipBehavior: Clip.antiAlias,
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(10.0),
                                   child: ElevatedButton(
 
                                       style: ElevatedButton.styleFrom(
@@ -325,7 +325,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: Text(S.of(context)!.login,
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontSize: 17,
+                                              fontSize: 17.0,
                                               fontWeight: FontWeight.w700))),
                                 ),
                               ),
@@ -341,7 +341,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: GoogleFonts.lato(
                                 fontWeight: FontWeight.w800,
                                 color: Colors.black45,
-                                fontSize: 13,
+                                fontSize: 13.0,
                               ),
                             ),
                             GestureDetector(
@@ -382,12 +382,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.all(30),
                                   child: Container(
-                                    width: 40,
-                                    height: 40,
+                                    width: 40.0,
+                                    height: 40.0,
                                     color: Colors.transparent,
                                     child: Platform.isIOS
                                         ? CupertinoActivityIndicator(
-                                            radius: 12,
+                                            radius: 12.0,
                                             color: Colors.white,
                                           )
                                         : CircularProgressIndicator(
@@ -414,7 +414,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   // shape: RoundedRectangleBorder(
                                   //     borderRadius: BorderRadius.circular(10)
                                   // ),
-                                    elevation: 2,
+                                    elevation: 2.0,
                                     primary: Colors.white),
                                 onPressed: () {
                                   _registerBloc.registerByGoogle();
@@ -424,13 +424,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   mainAxisAlignment:
                                   MainAxisAlignment.center,
                                   children: [
-                                    Text('Continue By Google',
+                                    Text(S.of(context)!.continueByGoogle,
                                         style: TextStyle(
                                             color: Colors.black87,
                                             fontSize: 14.0,
                                             fontWeight: FontWeight.w600)),
                                     SizedBox(
-                                      width: 10,
+                                      width: 10.0,
                                     ),
                                     CircleAvatar(
                                       radius: 10.0,
@@ -455,7 +455,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     // shape: RoundedRectangleBorder(
                                     //     borderRadius: BorderRadius.circular(10)
                                     // ),
-                                    elevation: 2,
+                                    elevation: 2.0,
                                     primary: Colors.white),
                                 onPressed: () {
                                   _registerBloc.registerByApple();
@@ -464,13 +464,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('Continue By Apple',
+                                    Text(S.of(context)!.continueByApple,
                                         style: TextStyle(
                                             color: Colors.black87,
                                             fontSize: 14.0,
                                             fontWeight: FontWeight.w600)),
                                     SizedBox(
-                                      width: 10,
+                                      width: 10.0,
                                     ),
                                     Container(
                                       width: 20.0,
@@ -484,7 +484,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 )),
                           )),
                       SizedBox(
-                        height: 30,
+                        height: 30.0,
                       ),
                     ],
                   ),

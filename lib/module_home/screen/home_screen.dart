@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void dispose() {
     super.dispose();
-    print('Home Screen Is Dispose !!!!!!!!!!!!');
+    EasyLoading.dismiss();
     WidgetsBinding.instance.removeObserver(this);
   }
 
@@ -676,7 +676,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         height: 16,
                                       ),
                                       Container(
-                                        height: 200,
+                                        height: 215.0,
                                         width: SizeConfig.screenWidth,
                                         padding: EdgeInsets.only(
                                             bottom: 8.0, left: 8.0, right: 8.0),

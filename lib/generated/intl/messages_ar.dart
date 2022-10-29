@@ -23,6 +23,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "emailAddressIsRequired": MessageLookupByLibrary.simpleMessage("الايميل مطلوب"),
     "passwordIsRequired": MessageLookupByLibrary.simpleMessage("كلمة السر مطلوبة"),
     "invalidPhoneMessage": MessageLookupByLibrary.simpleMessage("رقم هاتف غير صحيح"),
+    "continueByGoogle": MessageLookupByLibrary.simpleMessage("التسجيل بواسطة غوغل"),
+    "continueByApple": MessageLookupByLibrary.simpleMessage("التسجيل بواسطة آبل"),
 
     /// Register Page
 
@@ -276,7 +278,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "signedOutSuccessfully": MessageLookupByLibrary.simpleMessage("تم تسجيل الخروج بنجاح"),
     "nextTimeBookMark": MessageLookupByLibrary.simpleMessage("أضف علامات مرجعية للمرة القادمة"),
     "cart": MessageLookupByLibrary.simpleMessage("السلة"),
-    "plot": MessageLookupByLibrary.simpleMessage("حبة"),
+    "pcs": MessageLookupByLibrary.simpleMessage("حبة"),
     "note": MessageLookupByLibrary.simpleMessage("ملاحظة"),
     "noteMessage": MessageLookupByLibrary.simpleMessage("ستظهر هذه الملاحظة عند مقدم خدمة التوصيل"),
     "validPhone": MessageLookupByLibrary.simpleMessage("ادخل رقم هاتف صحيح"),
@@ -285,9 +287,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "numberOfItemsRequired": MessageLookupByLibrary.simpleMessage("حدد عدد العناصر المطلوب"),
     "fetchOrdersDoneMessage": MessageLookupByLibrary.simpleMessage("تم تحميل جميع الطلبات"),
     "fetchOrdersErrorMessage": MessageLookupByLibrary.simpleMessage("حدث خطأ في تحميل الطلبات قم بالتمرير للأسفل للتحديث"),
-
-
-
+    "removeItemsTheAreMissing": MessageLookupByLibrary.simpleMessage("قم بإزالة العناصر غير المتواجدة"),
+    "cancelOrder": MessageLookupByLibrary.simpleMessage("الغاء الطلب"),
+    "titleMessageCancelOrder": MessageLookupByLibrary.simpleMessage("هل تريد حذف هذا الطلب؟"),
+    "subTitleMessageCancelOrder": MessageLookupByLibrary.simpleMessage("ملاحظة: عند حذف الطلب ، لا يمكنك الحصول عليه مرة أخرى ، مما يعني أنه لن يتم أرشفته."),
+    "cancelOrderErrorMessage": MessageLookupByLibrary.simpleMessage("حدث خطأ ، حاول مرة أخرى!"),
+    "cancelOrderSuccessfullyMessage": MessageLookupByLibrary.simpleMessage("تمت الغاء الطلب بنجاح"),
+    "importantCreditCardsMessage": MessageLookupByLibrary.simpleMessage("هام: التطبيق لا يحفظ بيانات البطاقة"),
 
 
 

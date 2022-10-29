@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:my_kom/consts/order_status.dart';
 import 'package:my_kom/consts/payment_method.dart';
+import 'package:my_kom/consts/utils_const.dart';
 import 'package:my_kom/module_authorization/presistance/auth_prefs_helper.dart';
 import 'package:my_kom/module_company/models/product_model.dart';
 import 'package:my_kom/module_map/service/map_service.dart';
@@ -225,7 +226,7 @@ return false;
         await _orderRepository.getCurrentStateOfProductById(response.products[i].id).then((rawProduct) {
          ProductModel _pro = ProductModel.fromJson(rawProduct);
          _pro.orderQuantity = response.products[i].orderQuantity;
-         _pro.isExist = true;
+         _pro.isExist = false;
          _products.add(_pro);
         }).catchError((e){
           print(e.toString());
@@ -268,7 +269,7 @@ return false;
   Future<CreateOrderResponse> addNewOrder(
       {required List<ProductModel>  products ,required String storeId,required String addressName, required String deliveryTimes,
         required bool orderType , required GeoJson destination, required String phoneNumber,required String paymentMethod,
-        required  double amount , required String? cardId,required int numberOfMonth,required bool reorder,String? description,String? arDescription
+        required  double amount , required String? cardId,required int numberOfMonth,String? description,String? arDescription
         ,required int? customerOrderID,required List<String>? productsIds,
         required String note,
         required String? orderSource,
@@ -287,8 +288,6 @@ return false;
       int? customer_order_id = await _orderRepository.generateOrderID();
 
 
-      /// New Order
-      if (!reorder) {
 
         ///For avoid the modification process from the ui (amount = 0.0)
         amount = 0.0;
@@ -374,73 +373,73 @@ return false;
              Map<String, dynamic> map = orderSnapShot.data() as Map<String, dynamic>;
              map['id'] = orderSnapShot.id;
              await _updateOrderPaymentState(orderSnapShot.id);
-             return CreateOrderResponse(order: OrderModel.mainDetailsFromJson(map), message: 'Success',);
+             return CreateOrderResponse(order: OrderModel.mainDetailsFromJson(map), message:UtilsConst.lang == 'en'? 'Your order has been Successfully sent':'تم ارسال طلبك بنجاح',);
            }
 
          else{
-          return CreateOrderResponse(order:null, message: 'Payment Field');
+           return CreateOrderResponse(order:null, message:UtilsConst.lang == 'en'? 'An Error occurred in the payment process ,check the balance or internet connection':'حدث خطأ في عملية الدفع ، تأكد من الرصيد او من الاتصال بالانترنت');
+
          }
         }
 
-      }
 
-      /// Old Order
-      else {
-        if (customer_order_id == null)
-          throw Exception();
-
-        orderRequest = CreateOrderRequest(
-            userId: uId!,
-            storeId: storeId,
-            vipOrder: orderType,
-            destination: destination,
-            phone: phoneNumber,
-            payment: paymentMethod,
-            paymentState: false,
-            products: products,
-            numberOfMonth: numberOfMonth,
-            deliveryTime: deliveryTimes,
-            orderValue: amount,
-            startDate: date.toIso8601String(),
-            description: description!,
-            addressName: addressName,
-            cardId: cardId,
-            customerOrderID: customer_order_id,
-            productsIdes: productsIds!,
-            note: note,
-            orderSource: orderSource,
-            ar_description: arDescription!,
-            buildingHomeNumber: buildingHomeId
-
-        );
-        orderRequest.status = OrderStatus.INIT.name;
-
-
-        orderSnapShot = await _orderRepository.addNewOrder(
-            orderRequest);
-
-        /// Here is the payment process (After adding the order to the data base)
-        if(paymentMethod == PaymentMethodConst.CREDIT_CARD){
-          bool paymentResult =  await _paymentProcess(paymentMethodID:cardId!, products: products);
-          if(paymentResult)
-          {
-            print('msg: success payment , tag: order service');
-            Map<String, dynamic> map = orderSnapShot.data() as Map<String, dynamic>;
-            map['id'] = orderSnapShot.id;
-
-            /// Update Payment Order State (You must be in the cloud function for the complete scenario)
-            await _updateOrderPaymentState(orderSnapShot.id);
-
-
-            return CreateOrderResponse(order: OrderModel.mainDetailsFromJson(map), message: 'Success');
-
-          }
-
-          else{
-            return CreateOrderResponse(order:null, message: 'Payment Field');
-          }
-        }
-      }
+      // /// Old Order
+      // else {
+      //   if (customer_order_id == null)
+      //     throw Exception();
+      //
+      //   orderRequest = CreateOrderRequest(
+      //       userId: uId!,
+      //       storeId: storeId,
+      //       vipOrder: orderType,
+      //       destination: destination,
+      //       phone: phoneNumber,
+      //       payment: paymentMethod,
+      //       paymentState: false,
+      //       products: products,
+      //       numberOfMonth: numberOfMonth,
+      //       deliveryTime: deliveryTimes,
+      //       orderValue: amount,
+      //       startDate: date.toIso8601String(),
+      //       description: description!,
+      //       addressName: addressName,
+      //       cardId: cardId,
+      //       customerOrderID: customer_order_id,
+      //       productsIdes: productsIds!,
+      //       note: note,
+      //       orderSource: orderSource,
+      //       ar_description: arDescription!,
+      //       buildingHomeNumber: buildingHomeId
+      //
+      //   );
+      //   orderRequest.status = OrderStatus.INIT.name;
+      //
+      //
+      //   orderSnapShot = await _orderRepository.addNewOrder(
+      //       orderRequest);
+      //
+      //   /// Here is the payment process (After adding the order to the data base)
+      //   if(paymentMethod == PaymentMethodConst.CREDIT_CARD){
+      //     bool paymentResult =  await _paymentProcess(paymentMethodID:cardId!, products: products);
+      //     if(paymentResult)
+      //     {
+      //       print('msg: success payment , tag: order service');
+      //       Map<String, dynamic> map = orderSnapShot.data() as Map<String, dynamic>;
+      //       map['id'] = orderSnapShot.id;
+      //
+      //       /// Update Payment Order State (You must be in the cloud function for the complete scenario)
+      //       await _updateOrderPaymentState(orderSnapShot.id);
+      //
+      //
+      //       return CreateOrderResponse(order: OrderModel.mainDetailsFromJson(map), message: 'Success');
+      //
+      //     }
+      //
+      //     else{
+      //       return CreateOrderResponse(order:null, message: 'Payment Field');
+      //     }
+      //   }
+      // }
       // DocumentSnapshot orderSnapShot = await _orderRepository.addNewOrder(
       //     orderRequest);
 
@@ -454,14 +453,14 @@ return false;
       // await createpurchase(amount: amount, cardId: cardId!, userId: uId, orderID: orderSnapShot.id, date: DateTime.now());
       Map<String, dynamic> map = orderSnapShot.data() as Map<String, dynamic>;
       map['id'] = orderSnapShot.id;
-      return CreateOrderResponse(order: OrderModel.mainDetailsFromJson(map), message: 'Payment Field');
+      return CreateOrderResponse(order: OrderModel.mainDetailsFromJson(map), message:UtilsConst.lang == 'en'? 'Your order has been Successfully sent':'تم ارسال طلبك بنجاح');
 
     }catch(e){
-      if(e is ShopException)
+      if(e is PaymentFieldException)
         {
-          return CreateOrderResponse(order:null, message: 'Payment Field');
+          return CreateOrderResponse(order:null, message:UtilsConst.lang == 'en'? 'An Error occurred in the payment process ,check the balance or internet connection':'حدث خطأ في عملية الدفع ، تأكد من الرصيد او من الاتصال بالانترنت');
         }
-      return CreateOrderResponse(order:null, message: 'Create Order Field');
+      return CreateOrderResponse(order:null, message:UtilsConst.lang == 'en'?'An error occurred , try again !':'حدث خطأ, حاول مجددا');
     }
   }
 
@@ -493,7 +492,7 @@ return false;
       print(e.toString());
       /// An error occurred in the payment process
       /// Customize Exception
-      throw ShopException(e.toString());
+      throw PaymentFieldException(e.toString());
     }
   }
 
@@ -536,32 +535,32 @@ return false;
       }
   }
 
- Future<CreateOrderResponse> reorder(String orderID)async {
-    try{
-      OrderModel? order =  await getOrderDetails(orderID);
-
-      if(order == null){
-        return CreateOrderResponse(order: null ,message: 'Error in Get Detail For Re order');
-      }
-      else{
-
-        CreateOrderResponse response = await addNewOrder(orderSource: order.orderSource, note: order.note, storeId:order.storeId,productsIds: order.productIds,customerOrderID:order.customerOrderID,products: order.products, addressName: order.addressName, deliveryTimes: order.deliveryTime, orderType: order.vipOrder, destination: order.destination, phoneNumber: order.phone, paymentMethod: order.payment, amount: order.orderValue, cardId: order.cardId, numberOfMonth: order.numberOfMonth,
-            reorder: true,
-            description: order.description,
-            arDescription: order.ar_description,
-            buildingHomeId: order.buildingHomeId,
-
-        );
-        return response;
-      }
-    }catch(e){
-      if(e is ShopException)
-      {
-        return CreateOrderResponse(order:null, message: 'Payment Field');
-      }
-      return CreateOrderResponse(order:null, message: 'Create Order Field');
-    }
-    }
+ // Future<CreateOrderResponse> reorder(String orderID)async {
+ //    try{
+ //      OrderModel? order =  await getOrderDetails(orderID);
+ //
+ //      if(order == null){
+ //        return CreateOrderResponse(order: null ,message: 'Error in Get Detail For Re order');
+ //      }
+ //      else{
+ //
+ //        CreateOrderResponse response = await addNewOrder(orderSource: order.orderSource, note: order.note, storeId:order.storeId,productsIds: order.productIds,customerOrderID:order.customerOrderID,products: order.products, addressName: order.addressName, deliveryTimes: order.deliveryTime, orderType: order.vipOrder, destination: order.destination, phoneNumber: order.phone, paymentMethod: order.payment, amount: order.orderValue, cardId: order.cardId, numberOfMonth: order.numberOfMonth,
+ //            reorder: true,
+ //            description: order.description,
+ //            arDescription: order.ar_description,
+ //            buildingHomeId: order.buildingHomeId,
+ //
+ //        );
+ //        return response;
+ //      }
+ //    }catch(e){
+ //      if(e is ShopException)
+ //      {
+ //        return CreateOrderResponse(order:null, message: 'Payment Field');
+ //      }
+ //      return CreateOrderResponse(order:null, message: 'Create Order Field');
+ //    }
+ //    }
 
 
 

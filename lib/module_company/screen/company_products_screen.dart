@@ -176,7 +176,7 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                   child: TextFormField(
                     controller: _serachController,
                     style: TextStyle(
-                     fontSize: 15
+                     fontSize: 15.0
                     ),
                     onChanged: (String query){
                       productsCompanyBloc.search(query.toUpperCase());
@@ -188,7 +188,7 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                         prefixIcon: IconButton(
                           icon: Icon(
                             Icons.search,
-                            size: 22,
+                            size: 22.0,
                             color: Colors.black38,
                           ),
                           onPressed: () {
@@ -201,7 +201,7 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                 ),
               ),
               SizedBox(
-                height: 20,
+                height: 20.0,
               ),
               Expanded(
                 child: BlocConsumer<ProductsCompanyBloc, ProductsCompanyStates>(
@@ -225,25 +225,25 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
           ),
         ),
       ),
-      bottomNavigationBar:  SafeArea(
+      bottomNavigationBar: SafeArea(
         bottom: true,
-        child: Container(height: 75,
+        child: Container(height: 75.0,
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.only(topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+                topRight: Radius.circular(20.0),
               ),
               boxShadow: [BoxShadow(
                   offset:Offset(0,-3),
                   color: Colors.black12,
-                  blurRadius: 3
+                  blurRadius: 3.0
               )]
 
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              SizedBox(height: 2,),
+              SizedBox(height: 2.0,),
               FutureBuilder<double?>(
                   future: _preferencesHelper.getMinimumPurchaseStore(),
                   builder: (context,AsyncSnapshot<double?> snap){
@@ -254,12 +254,12 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                     }
               }),
               Container(
-                height: 38,
-                margin: EdgeInsets.symmetric(horizontal: 20,vertical: 4),
+                height: 38.0,
+                margin: EdgeInsets.symmetric(horizontal: 20.0,vertical: 4.0),
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                     color: ColorsConst.mainColor,
-                    borderRadius: BorderRadius.circular(10)
+                    borderRadius: BorderRadius.circular(10.0)
                 ),
                 child: MaterialButton(
                   onPressed: (){
@@ -407,9 +407,7 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                                                           width: SizeConfig
                                                               .widhtMulti *
                                                               13,
-                                                          height: SizeConfig
-                                                              .heightMulti *
-                                                              4,
+                                                          height: 30.0,
                                                           decoration: BoxDecoration(
                                                               color: Colors.orange,
                                                               borderRadius:
@@ -434,9 +432,7 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                                                           width: SizeConfig
                                                               .widhtMulti *
                                                               13,
-                                                          height: SizeConfig
-                                                              .heightMulti *
-                                                              4,
+                                                          height: 30.0,
                                                           decoration: BoxDecoration(
                                                               color: Colors.orange,
                                                               borderRadius:(UtilsConst.lang == 'ar')?
@@ -545,7 +541,7 @@ class _CompanyProductScreenState extends State<CompanyProductScreen> {
                                                       child: Text(
                                                         items[index]
                                                             .quantity
-                                                            .toString() +' '+ S.of(context)!.plot,
+                                                            .toString() +' '+S.of(context)!.pcs,
 
                                                         style: TextStyle(
 

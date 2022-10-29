@@ -15,7 +15,6 @@ import 'package:my_kom/module_orders/orders_routes.dart';
 import 'package:my_kom/module_orders/service/orders/orders.service.dart';
 import 'package:my_kom/module_orders/state_manager/batch_bloc.dart';
 import 'package:my_kom/module_orders/state_manager/captain_orders/orders_bloc.dart';
-import 'package:my_kom/module_orders/state_manager/new_order/new_order.state_manager.dart';
 import 'package:my_kom/module_orders/state_manager/order_detail_bloc.dart';
 import 'package:my_kom/module_orders/ui/widgets/no_data_for_display_widget.dart';
 import 'package:my_kom/module_shoping/bloc/shopping_cart_bloc.dart';
@@ -257,185 +256,187 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
            else
           return RefreshIndicator(
           onRefresh: ()=>onRefreshMyOrder(),
-          child: ListView.separated(
-            itemCount:orders.length +1,
-            controller: _pendingOrdersScrollController,
-            separatorBuilder: (context,index){
-              return SizedBox(height: 8,);
-            },
-            itemBuilder: (context,index){
-              if(index == orders.length){
-                return BlocBuilder<BatchBloc,BatchStates>(
-                  bloc: _pendingOrdersListBloc.batchBloc,
-                  builder: (BuildContext context, state) {
+          child: Scrollbar(
+            child: ListView.separated(
+              itemCount:orders.length +1,
+              controller: _pendingOrdersScrollController,
+              separatorBuilder: (context,index){
+                return SizedBox(height: 8,);
+              },
+              itemBuilder: (context,index){
+                if(index == orders.length){
+                  return BlocBuilder<BatchBloc,BatchStates>(
+                    bloc: _pendingOrdersListBloc.batchBloc,
+                    builder: (BuildContext context, state) {
 
-                    if(state is BatchLoadingState){
-                      return Container(
-                        margin: EdgeInsets.only(bottom: 20),
-                        padding: EdgeInsets.symmetric(vertical: 32.0),
-                        alignment: Alignment.center,
-                        width: double.infinity,
-                        child: SizedBox(
-                          height: 20,width: 20,
-                          child: Platform.isIOS? CupertinoActivityIndicator():CircularProgressIndicator(),
-                        ),
-                      );
-                    }else if (state is BatchErrorState)
-                    {
-                      return Center(child: Text(S.of(context)!.fetchOrdersErrorMessage,textAlign: TextAlign.center,style: TextStyle(fontSize: 13,color: Colors.black54),),);
-                    }else if (state is BatchSuccessState)
-                    {
-                      if(state.length == 0)
-                        return Center(child: Text(S.of(context)!.fetchOrdersDoneMessage,textAlign: TextAlign.center,style: TextStyle(fontSize: 13,color: Colors.black54),),);
+                      if(state is BatchLoadingState){
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 20),
+                          padding: EdgeInsets.symmetric(vertical: 32.0),
+                          alignment: Alignment.center,
+                          width: double.infinity,
+                          child: SizedBox(
+                            height: 20,width: 20,
+                            child: Platform.isIOS? CupertinoActivityIndicator():CircularProgressIndicator(),
+                          ),
+                        );
+                      }else if (state is BatchErrorState)
+                      {
+                        return Center(child: Text(S.of(context)!.fetchOrdersErrorMessage,textAlign: TextAlign.center,style: TextStyle(fontSize: 13,color: Colors.black54),),);
+                      }else if (state is BatchSuccessState)
+                      {
+                        if(state.length == 0)
+                          return Center(child: Text(S.of(context)!.fetchOrdersDoneMessage,textAlign: TextAlign.center,style: TextStyle(fontSize: 13,color: Colors.black54),),);
+                        else  return SizedBox.shrink();
+                      }
                       else  return SizedBox.shrink();
-                    }
-                    else  return SizedBox.shrink();
 
-                  },);
-              }
-              return Container(
-                height: 180,
-                width: double.infinity,
-                padding: EdgeInsets.all(10),
-                margin: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius:1,
-                      spreadRadius: 1
-                    )
-                  ],
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(width: 50,height: 50,
-                        child: Image.asset('assets/order_icon.png'),),
-                        SizedBox(width: 15,),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
+                    },);
+                }
+                return Container(
+                  height: 180,
+                  width: double.infinity,
+                  padding: EdgeInsets.all(10),
+                  margin: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius:1,
+                        spreadRadius: 1
+                      )
+                    ],
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(width: 50,height: 50,
+                          child: Image.asset('assets/order_icon.png'),),
+                          SizedBox(width: 15,),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
 
-                                  Spacer(),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 8,vertical: 2),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30),
-                                      color: ColorsConst.mainColor.withOpacity(0.1)
-                                    ),
-                                    child: Text('${S.of(context)!.orderNumber} : '+orders[index].customerOrderID.toString() ,style: GoogleFonts.lato(
-                                        color: ColorsConst.mainColor,
+                                    Spacer(),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8,vertical: 2),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(30),
+                                        color: ColorsConst.mainColor.withOpacity(0.1)
+                                      ),
+                                      child: Text('${S.of(context)!.orderNumber} : '+orders[index].customerOrderID.toString() ,style: GoogleFonts.lato(
+                                          color: ColorsConst.mainColor,
+                                          fontSize: 12,
+                                          letterSpacing: 1,
+                                          fontWeight: FontWeight.bold
+                                      ),),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height: 8,),
+                                 Text((UtilsConst.lang == 'en')?orders[index].description:orders[index].ar_description,overflow: TextOverflow.ellipsis,maxLines: 2,style: GoogleFonts.lato(
+
+                                      fontSize: 12,
+
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w800
+                                  ),
+                                ),
+                                SizedBox(height:6,),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(Icons.location_on_outlined , color: Colors.black45,size: 12,),
+                                    Expanded(
+                                      child: Text(orders[index].addressName,overflow: TextOverflow.ellipsis,style: GoogleFonts.lato(
                                         fontSize: 12,
-                                        letterSpacing: 1,
-                                        fontWeight: FontWeight.bold
-                                    ),),
-                                  )
-                                ],
-                              ),
-                              SizedBox(height: 8,),
-                               Text((UtilsConst.lang == 'en')?orders[index].description:orders[index].ar_description,overflow: TextOverflow.ellipsis,maxLines: 2,style: GoogleFonts.lato(
+                                        color: Colors.black45,
+                                        fontWeight: FontWeight.w800,
 
-                                    fontSize: 12,
+                                      )),
+                                    )
 
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w800
+                                  ],),
+                                SizedBox(height: 6,),
+                                Text('${orders[index].orderValue.toString()}  ${UtilsConst.lang == 'en'? 'AED':'د.إ'}',style: GoogleFonts.lato(
+                                    fontSize: 14.0,
+                                    color: ColorsConst.mainColor,
+                                    fontWeight: FontWeight.bold
+                                )),
+                                SizedBox(height: 4,),
+
+                              ],
+                            ),
+                          ),
+
+                        ],
+                      ),
+                      Spacer(),
+                      SizedBox(height: 4,),
+                      Container(
+                        height: 30,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                clipBehavior: Clip.antiAlias,
+                                decoration: BoxDecoration(
+                                    color: Colors.white
+                                    ,
+                                    border: Border.all(
+                                        color: ColorsConst.mainColor,
+                                        width: 2
+                                    ),
+                                    borderRadius: BorderRadius.circular(10)
+                                ),
+                                child: MaterialButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(maincontext, OrdersRoutes.ORDER_DETAIL_SCREEN,arguments: orders[index].id);
+                                  },
+                                  child: Text(S.of(context)!.orderDetail, style: TextStyle(
+                                      color: ColorsConst.mainColor,
+                                      fontSize: 14.0),),
+
                                 ),
                               ),
-                              SizedBox(height:6,),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Icon(Icons.location_on_outlined , color: Colors.black45,size: 12,),
-                                  Expanded(
-                                    child: Text(orders[index].addressName,overflow: TextOverflow.ellipsis,style: GoogleFonts.lato(
-                                      fontSize: 12,
-                                      color: Colors.black45,
-                                      fontWeight: FontWeight.w800,
-
-                                    )),
-                                  )
-
-                                ],),
-                              SizedBox(height: 6,),
-                              Text('${orders[index].orderValue.toString()}  ${UtilsConst.lang == 'en'? 'AED':'د.إ'}',style: GoogleFonts.lato(
-                                  fontSize: 14.0,
-                                  color: ColorsConst.mainColor,
-                                  fontWeight: FontWeight.bold
-                              )),
-                              SizedBox(height: 4,),
-
-                            ],
-                          ),
-                        ),
-
-                      ],
-                    ),
-                    Spacer(),
-                    SizedBox(height: 4,),
-                    Container(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
+                            ),
+                            SizedBox(width: SizeConfig.widhtMulti * 3,),
+                            Expanded(child: Container(
                               clipBehavior: Clip.antiAlias,
                               decoration: BoxDecoration(
-                                  color: Colors.white
-                                  ,
-                                  border: Border.all(
-                                      color: ColorsConst.mainColor,
-                                      width: 2
-                                  ),
+                                  color: ColorsConst.mainColor,
                                   borderRadius: BorderRadius.circular(10)
                               ),
                               child: MaterialButton(
                                 onPressed: () {
-                                  Navigator.pushNamed(maincontext, OrdersRoutes.ORDER_DETAIL_SCREEN,arguments: orders[index].id);
+
+                                Navigator.pushNamed(maincontext, OrdersRoutes.ORDER_STATUS_SCREEN,arguments:  orders[index].id);
                                 },
-                                child: Text(S.of(context)!.orderDetail, style: TextStyle(
-                                    color: ColorsConst.mainColor,
+                                child: Text(S.of(context)!.trackShipment, style: TextStyle(color: Colors.white,
                                     fontSize: 14.0),),
 
                               ),
-                            ),
-                          ),
-                          SizedBox(width: SizeConfig.widhtMulti * 3,),
-                          Expanded(child: Container(
-                            clipBehavior: Clip.antiAlias,
-                            decoration: BoxDecoration(
-                                color: ColorsConst.mainColor,
-                                borderRadius: BorderRadius.circular(10)
-                            ),
-                            child: MaterialButton(
-                              onPressed: () {
-
-                              Navigator.pushNamed(maincontext, OrdersRoutes.ORDER_STATUS_SCREEN,arguments:  orders[index].id);
-                              },
-                              child: Text(S.of(context)!.trackShipment, style: TextStyle(color: Colors.white,
-                                  fontSize: 14.0),),
-
-                            ),
-                          ))
-                          ,
-                        ],
+                            ))
+                            ,
+                          ],
+                        ),
                       ),
-                    ),
 
-                  ],
-                ),
-              );
-            },
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         );}
         else  return Center(
@@ -483,7 +484,7 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                 onRefresh: ()=>onRefreshMyOrder(),
                 child: Stack(
                   children: [
-                    ListView.separated(
+                    Scrollbar(child:  ListView.separated(
                       itemCount:orders.length +1,
                       controller: _finishedOrdersScrollController,
                       separatorBuilder: (context,index){
@@ -491,7 +492,7 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                       },
                       itemBuilder: (context,index){
                         if(index == orders.length){
-                         return BlocBuilder<BatchBloc,BatchStates>(
+                          return BlocBuilder<BatchBloc,BatchStates>(
                             bloc: _finishedOrdersListBloc.batchBloc,
                             builder: (BuildContext context, state) {
 
@@ -510,152 +511,153 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
                               {
                                 return Center(child: Text(S.of(context)!.fetchOrdersErrorMessage,textAlign: TextAlign.center,style: TextStyle(fontSize: 13,color: Colors.black54),),);
                               }else if (state is BatchSuccessState)
-                                {
-                                  if(state.length == 0)
-                                    return Center(child: Text(S.of(context)!.fetchOrdersDoneMessage,textAlign: TextAlign.center,style: TextStyle(fontSize: 13,color: Colors.black54),),);
-                                  else  return SizedBox.shrink();
-                                }
+                              {
+                                if(state.length == 0)
+                                  return Center(child: Text(S.of(context)!.fetchOrdersDoneMessage,textAlign: TextAlign.center,style: TextStyle(fontSize: 13,color: Colors.black54),),);
+                                else  return SizedBox.shrink();
+                              }
                               else  return SizedBox.shrink();
 
                             },);
                         }else
-                        return Container(
-                          height: 180,
-                          width: double.infinity,
-                          padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius:1,
-                                  spreadRadius: 1
-                              )
-                            ],
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-
-                                Spacer(),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 8,vertical: 2),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        color: ColorsConst.mainColor.withOpacity(0.1)
-                                    ),
-                                    child: Text('${S.of(context)!.orderNumber} : '+orders[index].customerOrderID.toString() ,style: GoogleFonts.lato(
-                                        color: ColorsConst.mainColor,
-                                        fontSize: 12,
-                                        letterSpacing: 1,
-                                        fontWeight: FontWeight.bold
-                                    ),),
-                                  )
-                                ],
-                              ),
-                              SizedBox(height: 8,),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: Text((UtilsConst.lang == 'en')?orders[index].description:orders[index].ar_description,overflow: TextOverflow.ellipsis,maxLines: 2,style: GoogleFonts.lato(
-
-                                    fontSize: 12.0,
-
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w800
-                                ),
-                                ),
-                              ),
-                              SizedBox(height: 4.0,),
-
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Icon(Icons.location_on_outlined , color: Colors.black45,size: 12,),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                                      child: Text(orders[index].addressName,overflow: TextOverflow.ellipsis,style: GoogleFonts.lato(
-                                        fontSize: 12.0,
-                                        color: Colors.black45,
-                                        fontWeight: FontWeight.w800,
-
-                                      )),
-                                    ),
-                                  )
-
-                                ],),
-                              SizedBox(height: 6.0,),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: Text('${orders[index].orderValue.toString()}  ${UtilsConst.lang == 'en'? 'AED':'د.إ'}' ,style: GoogleFonts.lato(
-                                    fontSize: 14.0,
-                                    color: ColorsConst.mainColor,
-                                    fontWeight: FontWeight.bold
-                                )),
-                              ),
-                              SizedBox(height: 6.0,),
-                              Spacer(),
-                              Container(
-                                height: 30.0,
-                                child: Row(
+                          return Container(
+                            height: 180,
+                            width: double.infinity,
+                            padding: EdgeInsets.all(10),
+                            margin: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius:1,
+                                    spreadRadius: 1
+                                )
+                              ],
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
+
+                                    Spacer(),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8,vertical: 2),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(30),
+                                          color: ColorsConst.mainColor.withOpacity(0.1)
+                                      ),
+                                      child: Text('${S.of(context)!.orderNumber} : '+orders[index].customerOrderID.toString() ,style: GoogleFonts.lato(
+                                          color: ColorsConst.mainColor,
+                                          fontSize: 12,
+                                          letterSpacing: 1,
+                                          fontWeight: FontWeight.bold
+                                      ),),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height: 8,),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: Text((UtilsConst.lang == 'en')?orders[index].description:orders[index].ar_description,overflow: TextOverflow.ellipsis,maxLines: 2,style: GoogleFonts.lato(
+
+                                      fontSize: 12.0,
+
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w800
+                                  ),
+                                  ),
+                                ),
+                                SizedBox(height: 4.0,),
+
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(Icons.location_on_outlined , color: Colors.black45,size: 12,),
                                     Expanded(
-                                      child: Container(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                                        child: Text(orders[index].addressName,overflow: TextOverflow.ellipsis,style: GoogleFonts.lato(
+                                          fontSize: 12.0,
+                                          color: Colors.black45,
+                                          fontWeight: FontWeight.w800,
+
+                                        )),
+                                      ),
+                                    )
+
+                                  ],),
+                                SizedBox(height: 6.0,),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: Text('${orders[index].orderValue.toString()}  ${UtilsConst.lang == 'en'? 'AED':'د.إ'}' ,style: GoogleFonts.lato(
+                                      fontSize: 14.0,
+                                      color: ColorsConst.mainColor,
+                                      fontWeight: FontWeight.bold
+                                  )),
+                                ),
+                                SizedBox(height: 6.0,),
+                                Spacer(),
+                                Container(
+                                  height: 30.0,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          clipBehavior: Clip.antiAlias,
+                                          decoration: BoxDecoration(
+                                              color: Colors.white
+                                              ,
+                                              border: Border.all(
+                                                  color: ColorsConst.mainColor,
+                                                  width: 2.0
+                                              ),
+                                              borderRadius: BorderRadius.circular(10)
+                                          ),
+                                          child: MaterialButton(
+                                            onPressed: () {
+                                              Navigator.pushNamed(context, OrdersRoutes.ORDER_DETAIL_SCREEN,arguments: orders[index].id);
+                                            },
+                                            child: Text(S.of(context)!.orderDetail, style: TextStyle(
+                                                color: ColorsConst.mainColor,
+                                                fontSize: 14.0),),
+
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: SizeConfig.widhtMulti * 3.0,),
+                                      Expanded(child:
+                                      Container(
+                                        height: 30.0,
                                         clipBehavior: Clip.antiAlias,
                                         decoration: BoxDecoration(
-                                            color: Colors.white
-                                            ,
-                                            border: Border.all(
-                                                color: ColorsConst.mainColor,
-                                                width: 2.0
-                                            ),
-                                            borderRadius: BorderRadius.circular(10)
+                                            color: ColorsConst.mainColor,
+                                            borderRadius: BorderRadius.circular(10.0)
                                         ),
                                         child: MaterialButton(
                                           onPressed: () {
-                                            Navigator.pushNamed(context, OrdersRoutes.ORDER_DETAIL_SCREEN,arguments: orders[index].id);
+                                            _orderDetailBloc.getDetailForReorder(orderId: orders[index].id);
                                           },
-                                          child: Text(S.of(context)!.orderDetail, style: TextStyle(
-                                              color: ColorsConst.mainColor,
+                                          child: Text(S.of(context)!.reOrder, style: TextStyle(color: Colors.white,
                                               fontSize: 14.0),),
 
                                         ),
-                                      ),
-                                    ),
-                                    SizedBox(width: SizeConfig.widhtMulti * 3.0,),
-                                    Expanded(child:
-                                    Container(
-                                      height: 30.0,
-                                      clipBehavior: Clip.antiAlias,
-                                      decoration: BoxDecoration(
-                                          color: ColorsConst.mainColor,
-                                          borderRadius: BorderRadius.circular(10.0)
-                                      ),
-                                      child: MaterialButton(
-                                        onPressed: () {
-                                          _orderDetailBloc.getDetailForReorder(orderId: orders[index].id);
-                                        },
-                                        child: Text(S.of(context)!.reOrder, style: TextStyle(color: Colors.white,
-                                            fontSize: 14.0),),
-
-                                      ),
-                                    )
-                                 )
-                                    ,
-                                  ],
+                                      )
+                                      )
+                                      ,
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
+                              ],
+                            ),
+                          );
                       },
-                    ),
+                    ),),
+
                     BlocListener<OrderDetailBloc,OrderDetailStates>(
                       bloc: _orderDetailBloc,
                       listener: (context,state)async{
