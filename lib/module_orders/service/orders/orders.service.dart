@@ -267,7 +267,7 @@ return false;
   }
 
   Future<CreateOrderResponse> addNewOrder(
-      {required List<ProductModel>  products ,required String storeId,required String addressName, required String deliveryTimes,
+      {required double fee,required List<ProductModel>  products ,required String storeId,required String addressName, required String deliveryTimes,
         required bool orderType , required GeoJson destination, required String phoneNumber,required String paymentMethod,
         required  double amount , required String? cardId,required int numberOfMonth,String? description,String? arDescription
         ,required int? customerOrderID,required List<String>? productsIds,
@@ -322,6 +322,16 @@ return false;
           }
         });
 
+        /// Add extra fee
+        ///
+        /// vip order?
+         if(orderType){
+           amount = amount +10.0;
+         }
+         /// Add fee
+         amount = amount + fee;
+
+
         if (customer_order_id == null)
           throw Exception();
 
@@ -366,7 +376,7 @@ return false;
 
         /// Here is the payment process (After adding the order to the data base)
         if(paymentMethod == PaymentMethodConst.CREDIT_CARD){
-         bool paymentResult =  await _paymentProcess(paymentMethodID:cardId!, products: newproducts);
+         bool paymentResult =  await _paymentProcess(paymentMethodID:cardId!, products: newproducts,fee:fee,isVip:orderType);
          if(paymentResult)
            {
              print('msg: success payment , tag: order service');
@@ -469,7 +479,7 @@ return false;
   /// Input (method id , items)
   /// output (bool , true if result is success)
   Future<bool> _paymentProcess(
-      {required String paymentMethodID,required List<ProductModel> products})async {
+      {required String paymentMethodID,required List<ProductModel> products,required bool isVip,required double fee})async {
     List<Map<String, dynamic>> items = [];
     products.forEach((element) {
       items.add({
@@ -479,6 +489,21 @@ return false;
 
       });
     });
+
+    /// add extra fee (vip and fee)
+    double _ext_fee = 0.0;
+    if(isVip){
+      _ext_fee = _ext_fee + 10.0;
+    }
+    _ext_fee = _ext_fee + fee;
+
+    items.add({
+      'id':'_mykom_extra_fee_id',
+      'price':_ext_fee,
+      'quantity':1
+    });
+
+
     try{
       PaymentState paymentState = await PaymentService().pay(paymentMethodID: paymentMethodID, items: items);
       if(paymentState.status == PaymentStates.success)

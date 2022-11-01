@@ -18,6 +18,7 @@ import 'package:my_kom/consts/delivery_times.dart';
 import 'package:my_kom/consts/payment_method.dart';
 import 'package:my_kom/consts/utils_const.dart';
 import 'package:my_kom/module_authorization/bloc/is_loggedin_cubit.dart';
+import 'package:my_kom/module_authorization/enums/consts.dart';
 import 'package:my_kom/module_authorization/presistance/auth_prefs_helper.dart';
 import 'package:my_kom/module_authorization/screens/widgets/login_sheak_alert.dart';
 import 'package:my_kom/module_authorization/screens/widgets/top_snack_bar_widgets.dart';
@@ -128,7 +129,7 @@ class _ShopScreenState extends State<ShopScreen> {
         });
 
         _authPrefsHelper.getPhone().then((value) {
-          _phoneController.text = value!;
+          _phoneController.text = value == null? Unknowns.UNKNOWN_INFO.name :value;
         });
       }
     });
@@ -2182,7 +2183,7 @@ class _ShopScreenState extends State<ShopScreen> {
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 8),
                 padding: EdgeInsets.all(8.0),
-                height: 130.0,
+                height: 150.0,
                 width: double.maxFinite,
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -2270,7 +2271,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          S.of(context)!.extraCharge,
+                          S.of(context)!.myKomExpress,
                           style: GoogleFonts.lato(
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
@@ -2295,7 +2296,27 @@ class _ShopScreenState extends State<ShopScreen> {
                       ],
                     ),
                     SizedBox(
-                      height: 6,
+                      height: 6.0,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          S.of(context)!.fee,
+                          style: GoogleFonts.lato(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.black54),
+                        ),
+                        Text( '${shopCartBloc.fee.toString()}  ${UtilsConst.lang == 'en' ? 'AED' : 'د.إ'}',       style: GoogleFonts.lato(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black54),)
+
+                      ],
+                    ),
+                    SizedBox(
+                      height: 12.0,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2313,13 +2334,13 @@ class _ShopScreenState extends State<ShopScreen> {
                               if (state is CartLoaded) {
                                 //double total = state.cart.deliveryFee(state.cart.subTotal)+ state.cart.subTotal;
                                 double total =
-                                    vipOrderValue + state.cart.subTotal;
+                                    vipOrderValue + state.cart.subTotal +state.cart.fee;
 
                                 orderValue = total;
                                 return Text(
                                     '${total.toString()}  ${UtilsConst.lang == 'en' ? 'AED' : 'د.إ'}',
                                     style: GoogleFonts.lato(
-                                        fontSize: 12,
+                                        fontSize: 12.0,
                                         fontWeight: FontWeight.w800,
                                         color: Colors.green));
                               } else {
@@ -3172,6 +3193,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                                                                         GeoJson geoJson = GeoJson(lat: addressModel.latitude, lon: addressModel.longitude);
 
                                                                                         _orderBloc.addNewOrder(
+                                                                                          fee:shopCartBloc.fee,
                                                                                           product: requestProduct,
                                                                                           deliveryTimes: deliveryTimesGroupValue,
                                                                                           orderType: vipOrder,
@@ -3241,6 +3263,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                               lon: addressModel.longitude);
 
                                           _orderBloc.addNewOrder(
+                                            fee: shopCartBloc.fee,
                                             product: requestProduct,
                                             deliveryTimes:
                                                 deliveryTimesGroupValue,

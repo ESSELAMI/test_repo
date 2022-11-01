@@ -304,6 +304,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "cancelOrderErrorMessage": MessageLookupByLibrary.simpleMessage("An Error Occurred , try again !"),
     "cancelOrderSuccessfullyMessage": MessageLookupByLibrary.simpleMessage("The order was successfully cancelled !"),
     "importantCreditCardsMessage": MessageLookupByLibrary.simpleMessage("Important: The application dose not save the card data"),
+    "fee": MessageLookupByLibrary.simpleMessage("Fee"),
 
 
 

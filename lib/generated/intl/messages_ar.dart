@@ -294,10 +294,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "cancelOrderErrorMessage": MessageLookupByLibrary.simpleMessage("حدث خطأ ، حاول مرة أخرى!"),
     "cancelOrderSuccessfullyMessage": MessageLookupByLibrary.simpleMessage("تمت الغاء الطلب بنجاح"),
     "importantCreditCardsMessage": MessageLookupByLibrary.simpleMessage("هام: التطبيق لا يحفظ بيانات البطاقة"),
-
-
-
-
+    "fee": MessageLookupByLibrary.simpleMessage("رسوم"),
 
 
   };

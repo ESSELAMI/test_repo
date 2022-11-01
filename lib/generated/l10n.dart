@@ -240,6 +240,17 @@ class S {
     );
   }
 
+  /// `Fee`
+  String get fee {
+    return Intl.message(
+      'Fee',
+      name: 'fee',
+      desc: '',
+      args: [],
+    );
+  }
+
+
   /// `Name`
   String get name {
     return Intl.message(

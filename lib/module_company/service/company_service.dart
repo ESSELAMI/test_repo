@@ -62,9 +62,11 @@ class CompanyService {
    await  _firestore.collection('stores').doc(storeId).get().then((value)async {
        Map<String , dynamic> map = value.data() as  Map<String , dynamic>;
        double minimumPurchase =(1.0) * map['minimum_purchase'] ;
+       double _fee =(1.0) * map['fee'] ;
         bool vip =  map['vip'];
       await _preferencesHelper.setCurrentStore(storeId);
       await _preferencesHelper.setMinimumPurchaseStore(minimumPurchase);
+      await _preferencesHelper.setFeeStore(_fee);
       await _preferencesHelper.setVipStore(vip);
      });
   }

@@ -61,6 +61,17 @@ class SharedPreferencesHelper {
     return  _sharedPreferences.getDouble('minimum_purchase');
   }
 
+  Future<void> setFeeStore(double fee) async {
+    SharedPreferences _sharedPreferences =
+    await SharedPreferences.getInstance();
+    await _sharedPreferences.setDouble('fee_store', fee);
+  }
+  Future<double?> getFeeStore() async {
+    SharedPreferences _sharedPreferences =
+    await SharedPreferences.getInstance();
+    return  _sharedPreferences.getDouble('fee_store');
+  }
+
 
   Future<void> setVipStore(bool vip) async {
     SharedPreferences _sharedPreferences =
